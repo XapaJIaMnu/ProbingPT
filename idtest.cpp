@@ -44,7 +44,7 @@ int main() {
     hash table to maintain indices to the elements*/
 
   //Set table size to the number of entries.
-  size_t size = Table::Size(9, 1.2);
+  size_t size = Table::Size(19, 1.2);
   boost::scoped_array<char> mem(new char[size]);
 
   //Why?

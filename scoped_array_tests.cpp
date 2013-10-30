@@ -48,7 +48,6 @@ void readTable(char * filename, boost::scoped_array<char> *mem, size_t size);
 void readTable(char * filename, boost::scoped_array<char> *mem, size_t size) {
 	//Initial position of the file is the end of the file, thus we know the size
 	std::ifstream file (filename, std::ios::in|std::ios::binary);
-
 	file.read ((char *)&mem, size); // read
 
 }
@@ -58,22 +57,22 @@ void serialize_table(boost::scoped_array<char> *mem, size_t size, char * filenam
 	std::ofstream os (filename, std::ios::binary);	
 
 	os.write((const char*)&size, sizeof(size));
-    os.write((const char*)&mem[0], size);
-    os.close();
+	os.write((const char*)&mem[0], size);
+	os.close();
 
 }
 
 int main() {
 
- 	StringPiece tohash1 = StringPiece("Hash text");
+	StringPiece tohash1 = StringPiece("Hash text");
  	int num1 = 1234;
  	int num2 = 3211;
  	StringPiece tohash2 = StringPiece("I REALLY. Like pies.");
 
- 	std::size_t len1 = tohash1.size();
- 	uint64_t key1 = util::MurmurHashNative(&tohash1, len1);
- 	std::size_t len2 = tohash1.size();
- 	uint64_t key2 = util::MurmurHashNative(&tohash2, len2);
+	std::size_t len1 = tohash1.size();
+	uint64_t key1 = util::MurmurHashNative(&tohash1, len1);
+	std::size_t len2 = tohash1.size();
+	uint64_t key2 = util::MurmurHashNative(&tohash2, len2);
 
 	//Make entries.
 	Entry entry1, entry2;
@@ -92,20 +91,19 @@ int main() {
 
 	const Entry * find_num;
 	table.Find(key1, find_num);
-  	std::cout << "Num 1 is " << find_num -> GetValue() << std::endl;
+	std::cout << "Num 1 is " << find_num -> GetValue() << std::endl;
 
-  	//Serialize to disk test
-  	serialize_table(&mem, size, "hashtable.dat");
+	//Serialize to disk test
+	serialize_table(&mem, size, "hashtable.dat");
 
-  	boost::scoped_array<char> read(new char[size]);
+	boost::scoped_array<char> read(new char[size]);
 
-  	readTable("hashtable.dat", &read, size);
-  	std::cout << "Here! " << std::endl;
-  	Table table2(read.get(), size);
-  	const Entry* find_num2;
-  	table2.Find(key1, find_num2);
-  	std::cout << "Num 1 is " << find_num2 -> GetValue() << std::endl;
+	readTable("hashtable.dat", &read, size);
+	Table table2(read.get(), size);
+	const Entry* find_num2;
+	table2.Find(key1, find_num2);
+	std::cout << "Num 1 is " << find_num2 -> GetValue() << std::endl;
 
 
-  	return 0;
+	return 0;
 }

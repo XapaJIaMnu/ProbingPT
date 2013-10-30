@@ -18,37 +18,48 @@
 #include <boost/functional/hash.hpp>
 #include <boost/algorithm/string.hpp> // TRim string
 
+struct line_text {
+  int value;
+  StringPiece text;
+};
+
+line_text split_line(StringPiece textin);
+
+line_text split_line(StringPiece textin) {
+  const char delim[] = " ||| ";
+  StringPiece str; //Temp string container
+  std::string temp; //Temp string for conversion
+  int num;
+  line_text output;
+
+  //Tokenize
+  util::TokenIter<util::MultiCharacter> it(textin, util::MultiCharacter(delim));
+  //Get string
+  str = *it;
+  output.text = str;
+  it++;
+
+  //Get num
+  str = *it;
+
+  //Convert to int
+  temp = str.as_string();
+  num = atoi(temp.c_str());
+  output.value = num;
+
+  return output;
+}
+
 int main() {
 
   StringPiece pesho = StringPiece("I like pie ||| 123154");
   StringPiece kiro = StringPiece("Kiro is a stupid brat ||| 12351");
 
-  const char delim[] = "|||";
-  StringPiece str;
-  std::string temp; //Temp string for conversion
-  int num;
+  line_text tmp;
 
-  util::TokenIter<util::MultiCharacter> it(pesho, util::MultiCharacter(delim));
-  str = *it;
-  std::cout << str << std::endl;
-  it++;
-  //Convert to int
-  str = *it;
-  temp = (str.as_string().substr(1,std::string::npos));
-  num = atoi(temp.c_str());
-  //num = *it;
-  std::cout << num << std::endl;
+  tmp = split_line(kiro);
 
-  util::TokenIter<util::MultiCharacter> it1(kiro, util::MultiCharacter(delim));
-  str = *it1;
-  std::cout << str << std::endl;
-  it1++;
-  //Convert to int
-  str = *it1;
-  temp = (str.as_string().substr(1,std::string::npos));
-  num = atoi(temp.c_str());
-  //num = *it1;
-  std::cout << num << std::endl;
+  std::cout << tmp.text << " " << tmp.value << std::endl;
 
   return 0;
 }

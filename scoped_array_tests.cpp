@@ -48,14 +48,13 @@ void readTable(char * filename, boost::scoped_array<char> *mem, size_t size);
 void readTable(char * filename, boost::scoped_array<char> *mem, size_t size) {
 	//Initial position of the file is the end of the file, thus we know the size
 	std::ifstream file (filename, std::ios::in|std::ios::binary);
-	file.read ((char *)&mem, size); // read
-
+	file.read ((char *)mem->get(), size); // read
+	file.close();
 }
 
 
 void serialize_table(boost::scoped_array<char> *mem, size_t size, char * filename){
 	std::ofstream os (filename, std::ios::binary);	
-
 	os.write((const char*)&size, sizeof(size));
 	os.write((const char*)&mem[0], size);
 	os.close();
@@ -99,9 +98,25 @@ int main() {
 	boost::scoped_array<char> read(new char[size]);
 
 	readTable("hashtable.dat", &read, size);
+
+	serialize_table(&read, size, "readtable2.dat");
+
 	Table table2(read.get(), size);
+	std::cout << "Table assigned! " << std::endl;
+	table2.CheckConsistency();
+	std::cout << "Table is consistent " << std::endl;
+
+	for (int i = 0; i < size; i++){
+		if (mem[i] == read[i]){
+		}else{
+			std::cout << "Error at " << i << std::endl;
+			break;
+		}
+	}
+
 	const Entry* find_num2;
-	table2.Find(key1, find_num2);
+	table2.Find(key2, find_num2);
+	std::cout << "Entry found! " << std::endl;
 	std::cout << "Num 1 is " << find_num2 -> GetValue() << std::endl;
 
 

@@ -46,6 +46,10 @@ struct Entry {
 //Define table
 typedef util::ProbingHashTable<Entry, boost::hash<uint64_t> > Table;
 
+void serialize_table(char *mem, size_t size, char * filename);
+
+void readTable(char * filename, char *mem, size_t size);
+
 //Ask if it's better to have it receive a pointer to a line_text struct
 line_text splitLine(StringPiece textin);
 
@@ -56,6 +60,22 @@ uint64_t getHash(StringPiece text) {
 	std::size_t len = text.size();
 	uint64_t key = util::MurmurHashNative(&text, len);
 	return key;
+}
+
+void readTable(char * filename, char *mem, size_t size) {
+	//Initial position of the file is the end of the file, thus we know the size
+	std::ifstream file (filename, std::ios::in|std::ios::binary);
+	file.read ((char *)mem, size); // read
+	file.close();
+}
+
+
+void serialize_table(char *mem, size_t size, char * filename){
+	std::ofstream os (filename, std::ios::binary);	
+	//os.write((const char*)&size, sizeof(size));
+	os.write((const char*)&mem[0], size);
+	os.close();
+
 }
 
 line_text splitLine(StringPiece textin) {
@@ -86,19 +106,22 @@ line_text splitLine(StringPiece textin) {
 int main(int argc, char* argv[]){
 
 	//Input file and table size
-	if (argc != 2) {
+	/*if (argc != 2) {
 		std::cout << "Provide input file and number of lines!" << std::endl;
 		return 1;
-	}
-	std::fstream fileread(argv[0], std::ios::in);
+	}*/
+	std::fstream fileread("source.uniq.rand", std::ios::in);
 	util::FilePiece filein(fileread);
-	int tablesize = atoi(argv[1]);
+	int tablesize = 23339836;
 
 	//Init the table
 	size_t size = Table::Size(tablesize, 1.2);
-	boost::scoped_array<char> mem(new char[size]);
-	Table table(mem.get(), size);
+	char * mem = new char[size];
+	memset(mem, 0, size);
+	Table table(mem, size);
 
+	//Output binary
+	std::ofstream os ("data.dat", std::ios::binary);
 	
 	//Vector with 1000 elements, after the 1000nd we swap to disk
 	std::vector<int> ram_container(1000);
@@ -128,13 +151,15 @@ int main(int argc, char* argv[]){
 			if (counter == 1000) {
 				counter = 0;
 				//write to memory
-				break; //stub
+				os.write((const char*)&ram_container[0], 1000 * sizeof(int));
 			}
 		} catch (util::EndOfFileException e){
 			std::cout << "End of file" << std::endl;
 			break;
 		}
 	}
+
+	serialize_table(mem, size, "hashtable.dat");
 	return 0;
 
 }

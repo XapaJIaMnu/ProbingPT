@@ -84,7 +84,7 @@ int main()
 
     map = (int*)mmap(0, filesize, PROT_READ, MAP_SHARED, fd, 0);
 
-    std::cout << "Here" << std::endl;
+    //End of memory mapping code
 
 
 
@@ -92,9 +92,11 @@ int main()
    	int tablesize = 23339836;
 	size_t size = Table::Size(tablesize, 1.2);
 	char * mem = new char[size];
+	memset(mem, 0, size);
 	readTable("hashtable.dat", mem, size);
 	Table table(mem, size);
-
+	table.CheckConsistency();
+	std::cout << "Table is consistent!" << std::endl;
 
 	//Get a key;
 	StringPiece str = StringPiece("! &apos; - and what is more");
@@ -102,21 +104,16 @@ int main()
 
 	const Entry * tmp;
 	table.Find(key, tmp);
+	std::cout <<"Key found" << std::endl;
+	unsigned int idx = tmp -> GetValue();
 
-	std::cout << "Here too" << std::endl;
+	std::cout << "Key is " << tmp -> GetKey() << ", expected " << key << std::endl;
 
-	unsigned int idx = 423; //tmp -> GetValue();
+	std::cout << "Value is " << map[idx] << " expected 425598091" << std::endl;
 
-	//std::cout << "Key is " << tmp -> GetKey() << std::endl;
-
-	std::cout << "IDX is " << idx << " array_length is " << array_length << std::endl;
-
-	std::cout << "Value is " << map[idx] << std::endl;
-
-
-	if (munmap(map, size) == -1) {
-	perror("Error un-mmapping the file");
-    }
+	//clean up
+	delete[] mem;
     close(fd);
+
     return 0;
 }

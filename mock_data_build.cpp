@@ -72,7 +72,6 @@ void readTable(char * filename, char *mem, size_t size) {
 
 void serialize_table(char *mem, size_t size, char * filename){
 	std::ofstream os (filename, std::ios::binary);	
-	//os.write((const char*)&size, sizeof(size));
 	os.write((const char*)&mem[0], size);
 	os.close();
 
@@ -128,36 +127,55 @@ int main(int argc, char* argv[]){
 	short counter = 0; //Counts how many entires are in the vector
 	unsigned int offset = 0; //Keeps track of the offset
 
+	//debuging variables
+	Entry kiro;
+	line_text temp;
+
 	while(true){
 		try {
 			//Process line read
 			line_text line;
 			line = splitLine(filein.ReadLine());
 
-			ram_container.push_back(line.value); //Put into the array
+			ram_container[counter] = line.value; //Put into the array
 
 			//Create an entry to keep track of the offset
 			Entry pesho;
 			pesho.value = offset;
 			pesho.key = getHash(line.text);
-			
 
 			//Put into table
 			table.Insert(pesho);
 			counter++;
 			offset++;
 
+			//debugging
+			kiro = pesho;
+			temp.value = line.value;
+			temp.text = line.text;
+
 			//Write to memory
 			if (counter == 1000) {
-				counter = 0;
 				//write to memory
-				os.write((const char*)&ram_container[0], 1000 * sizeof(int));
+				os.write((const char*)&ram_container[0], counter * sizeof(int));
+				counter = 0;
 			}
 		} catch (util::EndOfFileException e){
 			std::cout << "End of file" << std::endl;
+			os.write((const char*)&ram_container[0], counter * sizeof(int));
 			break;
 		}
 	}
+	//Close write stream:
+	os.close();
+	std::cout << "Last offset was " << offset << std::endl;
+	std::cout << "Last entry key " << kiro.key << " Value " << kiro.value << std::endl;
+	std::cout << "Last line text " << temp.text << " Num " << temp.value << std::endl;
+	std::cout << "Expected hash is " << getHash(temp.text) << std::endl;
+
+	const Entry * tocheck;
+	table.Find(kiro.key, tocheck);
+	std::cout << "Tocheck key " << tocheck -> GetKey() << " Tocheck value " << tocheck -> GetValue() << std::endl;
 
 	serialize_table(mem, size, "hashtable.dat");
 	return 0;

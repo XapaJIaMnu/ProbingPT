@@ -20,5 +20,4 @@ Hash 2 is 16088111493406602936
 Hash 1 is 5695319170298515428 With len 10
 Hash 2 is 5695319170298515428 With len 10
 
-Hash is dependent on the memory location of the OBJECT
-fuck this shite...
+Hash is dependent on the memory location of the OBJECT (maybe)

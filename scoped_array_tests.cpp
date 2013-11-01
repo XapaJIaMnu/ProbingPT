@@ -41,21 +41,21 @@ struct Entry {
 //Define table
 typedef util::ProbingHashTable<Entry, boost::hash<uint64_t> > Table;
 
-void serialize_table(boost::scoped_array<char> *mem, size_t size, char * filename);
+void serialize_table(char *mem, size_t size, char * filename);
 
-void readTable(char * filename, boost::scoped_array<char> *mem, size_t size);
+void readTable(char * filename, char *mem, size_t size);
 
-void readTable(char * filename, boost::scoped_array<char> *mem, size_t size) {
+void readTable(char * filename, char *mem, size_t size) {
 	//Initial position of the file is the end of the file, thus we know the size
 	std::ifstream file (filename, std::ios::in|std::ios::binary);
-	file.read ((char *)mem->get(), size); // read
+	file.read ((char *)*mem, size); // read
 	file.close();
 }
 
 
-void serialize_table(boost::scoped_array<char> *mem, size_t size, char * filename){
+void serialize_table(char *mem, size_t size, char * filename){
 	std::ofstream os (filename, std::ios::binary);	
-	os.write((const char*)&size, sizeof(size));
+	//os.write((const char*)&size, sizeof(size));
 	os.write((const char*)&mem[0], size);
 	os.close();
 
@@ -82,8 +82,9 @@ int main() {
 
 	//Init the table
 	size_t size = Table::Size(3, 1.2);
-	boost::scoped_array<char> mem(new char[size]);
-	Table table(mem.get(), size);
+	//boost::scoped_array<char> mem(new char[size]);
+	char* mem = new char[size];
+	Table table(mem, size);
 
 	table.Insert(entry1);
 	table.Insert(entry2);
@@ -93,15 +94,16 @@ int main() {
 	std::cout << "Num 1 is " << find_num -> GetValue() << std::endl;
 
 	//Serialize to disk test
-	serialize_table(&mem, size, "hashtable.dat");
+	serialize_table(mem, size, "hashtable.dat");
 
-	boost::scoped_array<char> read(new char[size]);
+	//boost::scoped_array<char> read(new char[size]);
+	char* read = new char[size];
 
-	readTable("hashtable.dat", &read, size);
+	readTable("hashtable.dat", read, size);
 
-	serialize_table(&read, size, "readtable2.dat");
+	serialize_table(read, size, "readtable2.dat");
 
-	Table table2(read.get(), size);
+	Table table2(read, size);
 	std::cout << "Table assigned! " << std::endl;
 	table2.CheckConsistency();
 	std::cout << "Table is consistent " << std::endl;

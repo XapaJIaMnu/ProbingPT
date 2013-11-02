@@ -23,9 +23,9 @@ int main() {
   StringPiece tohash = StringPiece("Hash text2");
   StringPiece identical = StringPiece("Hash text2");
   std::size_t len = tohash.size();
-  uint64_t key = util::MurmurHashNative(&tohash, len);
+  uint64_t key = util::MurmurHashNative(tohash.data(), len);
   std::size_t len2 = identical.size();
-  uint64_t key2 = util::MurmurHashNative(&identical, len2);
+  uint64_t key2 = util::MurmurHashNative(identical.data(), len2);
   std::cout << "Hash 1 is " << key << " With len " << len << std::endl;
   std::cout << "Hash 2 is " << key2 << " With len " << len2 << std::endl;
 

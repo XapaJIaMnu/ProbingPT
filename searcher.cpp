@@ -29,7 +29,7 @@ uint64_t getHash(StringPiece text);
 
 uint64_t getHash(StringPiece text) {
 	std::size_t len = text.size();
-	uint64_t key = util::MurmurHashNative(&text, len);
+	uint64_t key = util::MurmurHashNative(text.data(), len);
 	return key;
 }
 
@@ -85,8 +85,6 @@ int main()
     map = (int*)mmap(0, filesize, PROT_READ, MAP_SHARED, fd, 0);
 
     //End of memory mapping code
-
-
 
    	//Init the table
    	int tablesize = 23339836;

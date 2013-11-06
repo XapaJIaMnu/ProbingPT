@@ -8,19 +8,13 @@ Build KenLM first:
 
 ```
 cd lib/kenlm
-./bjam -j 5
-```
-Install the libkenlm library to your path.
-
-(Assuming you are already in lib/kenlm)
-```
-cp lib/libkenlm.so /usr/lib
+./bjam -j 5 link=static
 ```
 
 Now build the testsfiles with the following command:
 
 ```
-<clang++||g++> filename.cpp -I./ -L./ -lkenlm -o output.o
+<clang++||g++> filename.cpp -I./ -L./lib/kenlm/lib/ -lkenlm -lz -lbz2 -llzma output.o
 ```
 
 KenLM

@@ -127,10 +127,6 @@ int main(int argc, char* argv[]){
 	short counter = 0; //Counts how many entires are in the vector
 	unsigned int offset = 0; //Keeps track of the offset
 
-	//debuging variables
-	Entry kiro;
-	line_text temp;
-
 	while(true){
 		try {
 			//Process line read
@@ -149,11 +145,6 @@ int main(int argc, char* argv[]){
 			counter++;
 			offset++;
 
-			//debugging
-			kiro = pesho;
-			temp.value = line.value;
-			temp.text = line.text;
-
 			//Write to memory
 			if (counter == 1000) {
 				//write to memory
@@ -168,14 +159,6 @@ int main(int argc, char* argv[]){
 	}
 	//Close write stream:
 	os.close();
-	std::cout << "Last offset was " << offset << std::endl;
-	std::cout << "Last entry key " << kiro.key << " Value " << kiro.value << std::endl;
-	std::cout << "Last line text " << temp.text << " Num " << temp.value << std::endl;
-	std::cout << "Expected hash is " << getHash(temp.text) << std::endl;
-
-	const Entry * tocheck;
-	table.Find(kiro.key, tocheck);
-	std::cout << "Tocheck key " << tocheck -> GetKey() << " Tocheck value " << tocheck -> GetValue() << std::endl;
 
 	serialize_table(mem, size, "hashtable.dat");
 	return 0;

@@ -117,6 +117,7 @@ int main(int argc, char* argv[]) {
 	//Interactive search
 	std::cout << "Please enter a string to be searched, or exit to exit." << std::endl;
 	while (true){
+		bool found;
 		std::string cinstr = "";
 		getline(std::cin, cinstr);
 		if (cinstr == "exit"){
@@ -124,8 +125,13 @@ int main(int argc, char* argv[]) {
 		}else{
 			StringPiece tofind = StringPiece(cinstr);
 			key = getHash(cinstr);
-			table.Find(key, tmp);
-			std::cout << "Integer corresponding to " << cinstr << " is " << map[tmp -> GetValue()] << std::endl;
+			found = table.Find(key, tmp);
+			if (found) {
+				std::cout << "Integer corresponding to " << cinstr << " is " << map[tmp -> GetValue()] << std::endl;
+			} else {
+				std::cout << "Key not found!" << std::endl;
+			}
+			
 		}
 	}
 	//clean up

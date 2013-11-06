@@ -13,6 +13,8 @@
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
+#include <string>
 #include <sys/mman.h>
 #include <sys/stat.h> //For finding size of file
 #include <boost/functional/hash.hpp>
@@ -20,8 +22,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
-
-#define FILEPATH "data.dat"
 
 void readTable(char * filename, char *mem, size_t size);
 
@@ -63,35 +63,40 @@ struct Entry {
 //Define table
 typedef util::ProbingHashTable<Entry, boost::hash<uint64_t> > Table;
 
-int main()
-{
-    int i;
-    int fd;
-    int *map;  /* mmapped array of int's */
+int main(int argc, char* argv[]) {
+	if (argc != 3) {
+		// Tell the user how to run the program
+		std::cerr << "Usage: " << argv[0] << " path_to_hashtable path_to_data_bin" << std::endl;
+		return 1;
+	}
 
-    //Find the size
-    struct stat filestatus;
-    stat(FILEPATH, &filestatus);
-    unsigned long filesize = filestatus.st_size;
-    int array_length = filesize/sizeof(int) - 1; //The end of file has \0, which we don't want to count.
+	int i;
+	int fd;
+	int *map;  /* mmapped array of int's */
+
+	//Find the size
+	struct stat filestatus;
+	stat(argv[2], &filestatus);
+	unsigned long filesize = filestatus.st_size;
+	int array_length = filesize/sizeof(int) - 1; //The end of file has \0, which we don't want to count.
 
 
-    fd = open(FILEPATH, O_RDONLY);
-    if (fd == -1) {
-	perror("Error opening file for reading");
-	exit(EXIT_FAILURE);
-    }
+	fd = open(argv[2], O_RDONLY);
+	if (fd == -1) {
+		perror("Error opening file for reading");
+		exit(EXIT_FAILURE);
+	}
 
-    map = (int*)mmap(0, filesize, PROT_READ, MAP_SHARED, fd, 0);
+	map = (int*)mmap(0, filesize, PROT_READ, MAP_SHARED, fd, 0);
 
-    //End of memory mapping code
+	//End of memory mapping code
 
-   	//Init the table
-   	int tablesize = 23339836;
+	//Init the table
+	int tablesize = 23339836;
 	size_t size = Table::Size(tablesize, 1.2);
 	char * mem = new char[size];
 	memset(mem, 0, size);
-	readTable("hashtable.dat", mem, size);
+	readTable(argv[1], mem, size);
 	Table table(mem, size);
 	table.CheckConsistency();
 	std::cout << "Table is consistent!" << std::endl;
@@ -109,9 +114,23 @@ int main()
 
 	std::cout << "Value is " << map[idx] << " expected 425598091" << std::endl;
 
+	//Interactive search
+	std::cout << "Please enter a string to be searched, or exit to exit." << std::endl;
+	while (true){
+		std::string cinstr = "";
+		getline(std::cin, cinstr);
+		if (cinstr == "exit"){
+			break;
+		}else{
+			StringPiece tofind = StringPiece(cinstr);
+			key = getHash(cinstr);
+			table.Find(key, tmp);
+			std::cout << "Integer corresponding to " << cinstr << " is " << map[tmp -> GetValue()] << std::endl;
+		}
+	}
 	//clean up
 	delete[] mem;
-    close(fd);
+	close(fd);
 
-    return 0;
+	return 0;
 }

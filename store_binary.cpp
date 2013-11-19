@@ -118,7 +118,7 @@ line_text splitLine(StringPiece textin) {
 }
 
 int main(int argc, char* argv[]){
-	if (argc != 3) {
+	if (argc != 5) {
 		// Tell the user how to run the program
 		std::cerr << "Usage: " << argv[0] << " path_to_phrasetable number_of_lines output_bin_file output_hash_table" << std::endl;
 		return 1;

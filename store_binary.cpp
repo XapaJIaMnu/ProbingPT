@@ -6,6 +6,7 @@
 #include "util/tokenize_piece.hh"
 #include "util/murmur_hash.hh"
 #include "util/probing_hash_table.hh"
+#include "util/usage.hh"
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -30,11 +31,11 @@ struct Entry {
 		key = to;
 	}
 
-	unsigned int GetValue() const {
+	uint64_t GetValue() const {
 		return value;
 	}
 
-	unsigned int value;
+	uint64_t value;
 };
 
 //Define table
@@ -120,6 +121,7 @@ line_text splitLine(StringPiece textin) {
 int main(int argc, char* argv[]){
 	if (argc != 5) {
 		// Tell the user how to run the program
+		std::cerr << "Provided " << argc << " arguments, needed 4." << std::endl;
 		std::cerr << "Usage: " << argv[0] << " path_to_phrasetable number_of_lines output_bin_file output_hash_table" << std::endl;
 		return 1;
 	}
@@ -138,41 +140,68 @@ int main(int argc, char* argv[]){
 	std::ofstream os (argv[3], std::ios::binary);
 	
 	//Vector with 10000 elements, after the 9000nd we swap to disk, we have 10000 for buffer
-	std::vector<char> ram_container(10000);
+	std::vector<char> ram_container;
+	ram_container.reserve(10000);
 	std::vector<char>::iterator it = ram_container.begin();
+	unsigned int dist_from_start = 0;
+	uint64_t extra_counter = 0; //After we reset the counter, we still want to keep track of the correct offset, so
+									//we should keep an extra counter for that reason.
 
 
 	//Read everything and processs
 	while(true){
+		//Calculate offset
+		dist_from_start = distance(ram_container.begin(),it);
 		try {
 			//Process line read
 			line_text line;
 			line = splitLine(filein.ReadLine());
 
-			it = vector_append(&line, &ram_container, it); //Put into the array
-
 			//Create an entry to keep track of the offset
 			Entry pesho;
-			pesho.value = distance(ram_container.begin(),it);
+			pesho.value = dist_from_start + extra_counter;
 			pesho.key = getHash(line.source_phrase);
 
 			//Put into table
 			table.Insert(pesho);
 
+			it = vector_append(&line, &ram_container, it); //Put into the array and update iterator to the new end position
+
 			//Write to disk if over 10000
 			if (pesho.value > 9000) {
+				std::cout << "Dist counter " << dist_from_start << std::endl;
+				std::cout << "Extra counter " << extra_counter << std::endl;
 				//write to memory
-				os.write(&ram_container[0], distance(ram_container.begin(),it));
-				it = ram_container.begin();
+				os.write(&ram_container[0], dist_from_start);
+				//Clear the vector:
+				ram_container.clear();
+				ram_container.reserve(10000);
+				extra_counter += extra_counter + dist_from_start -1;
+				it = ram_container.begin(); //Reset iterator
 			}
 		} catch (util::EndOfFileException e){
 			std::cout << "End of file" << std::endl;
-			os.write(&ram_container[0], distance(ram_container.begin(),it));
+			os.write(&ram_container[0], dist_from_start);
 			break;
 		}
 	}
 
 	serialize_table(mem, size, argv[4]);
+	os.close();
+	util::PrintUsage(std::cout);
+
+	const Entry * tmp;
+
+	StringPiece test = StringPiece("! ! ! !");
+	uint64_t temp_hash = getHash(test);
+	bool found = table.Find(temp_hash, tmp);
+	std::cout << "Hash of test is " << temp_hash << std::endl;
+	std::cout << "Found is " << found << std::endl;
+
+	std::cout << "Position is " << tmp -> GetValue() << std::endl;
+
+	std::cout << "Extra counter is " << extra_counter << std::endl;
+
 	return 1;
 }
 

@@ -176,7 +176,7 @@ int main(int argc, char* argv[]){
 				//Clear the vector:
 				ram_container.clear();
 				ram_container.reserve(10000);
-				extra_counter += extra_counter + dist_from_start -1;
+				extra_counter += dist_from_start;
 				it = ram_container.begin(); //Reset iterator
 			}
 		} catch (util::EndOfFileException e){

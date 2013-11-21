@@ -24,7 +24,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-void readTable(char * filename, char *mem, size_t size);
+char * readTable(char * filename, size_t size);
 
 uint64_t getHash(StringPiece text);
 
@@ -34,19 +34,24 @@ uint64_t getHash(StringPiece text) {
 	return key;
 }
 
-
+/*
 void readTable(char * filename, char *mem, size_t size) {
+	std::cerr << "Normal IO" << std::endl;
 	//Initial position of the file is the end of the file, thus we know the size
 	std::ifstream file (filename, std::ios::in|std::ios::binary);
 	file.read ((char *)mem, size); // read
+	for (int i = 0; i < 10; i++){
+		std::cout << "First " << mem[i] << "Last " << mem[size-i] << std::endl;
+	}
 	file.close();
 }
+*/
 
-/*
-void readTable(char * filename, char *mem, size_t size) {
+char * readTable(char * filename, size_t size) {
+    std::cerr << "Mem map" << std::endl;
 	//Initial position of the file is the end of the file, thus we know the size
 	int fd;
-	char *map;  // mmapped char array
+	//char *map;  // mmapped char array
 
 	//Find the size
 	struct stat filestatus;
@@ -63,9 +68,9 @@ void readTable(char * filename, char *mem, size_t size) {
 		exit(EXIT_FAILURE);
 	}
 
-	mem = (char *)mmap(0, size, PROT_READ, MAP_SHARED, fd, 0);
+	return (char *)mmap(0, size, PROT_READ, MAP_SHARED, fd, 0);
 }
-*/
+
 //Hash table entry
 struct Entry {
 	uint64_t key;
@@ -125,10 +130,12 @@ int main(int argc, char* argv[]) {
 	//Init the table
 	int tablesize = atoi(argv[3]);
 	size_t size = Table::Size(tablesize, 1.2);
-	char * mem = new char[size];
-	memset(mem, 0, size);
-	readTable(argv[1], mem, size);
+
+	char * mem = readTable(argv[1], size);
 	Table table(mem, size);
+	for (int i = 0; i < 10; i++){
+		std::cout << "First " << mem[i] << "Last " << mem[size-i] << std::endl;
+	}
 	table.CheckConsistency();
 	std::cout << "Table is consistent!" << std::endl;
 

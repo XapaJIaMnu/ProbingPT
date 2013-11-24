@@ -87,9 +87,14 @@ int main(int argc, char* argv[]){
 				setsize = newsize;
 			}
 			lines++;
+			if (lines%10000 == 0){
+				std::cout << "On line: " << lines << std::endl;
+			}
 		} catch (util::EndOfFileException e){
 			std::cout << "End of file" << std::endl;
 			break;
 		}
 	}
+
+	std::cout << "Entries: " << lines << " Collisions: " << clashes << std::endl
 }

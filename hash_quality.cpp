@@ -96,5 +96,5 @@ int main(int argc, char* argv[]){
 		}
 	}
 
-	std::cout << "Entries: " << lines << " Collisions: " << clashes << std::endl
+	std::cout << "Entries: " << lines << " Collisions: " << clashes << std::endl;
 }

@@ -169,8 +169,6 @@ int main(int argc, char* argv[]){
 
 			//Write to disk if over 10000
 			if (dist_from_start > 9000) {
-				std::cout << "Dist counter " << dist_from_start << std::endl;
-				std::cout << "Extra counter " << extra_counter << std::endl;
 				//write to memory
 				os.write(&ram_container[0], dist_from_start);
 				//Clear the vector:
@@ -187,21 +185,13 @@ int main(int argc, char* argv[]){
 	}
 
 	serialize_table(mem, size, argv[4]);
+	
+	//clean up
 	os.close();
+	ram_container.clear();
+	delete[] mem;
+
 	util::PrintUsage(std::cout);
-
-	const Entry * tmp;
-
-	StringPiece test = StringPiece("! ! ! !");
-	uint64_t temp_hash = getHash(test);
-	bool found = table.Find(temp_hash, tmp);
-	std::cout << "Hash of test is " << temp_hash << std::endl;
-	std::cout << "Found is " << found << std::endl;
-
-	std::cout << "Position is " << tmp -> GetValue() << std::endl;
-
-	std::cout << "Extra counter is " << extra_counter << std::endl;
-
 	return 1;
 }
 

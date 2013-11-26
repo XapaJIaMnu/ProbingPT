@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) {
 	//For searching
 	const Entry * tmp;
 	uint64_t key;
-	
+
 	//Interactive search
 	std::cout << "Please enter a string to be searched, or exit to exit." << std::endl;
 	while (true){
@@ -147,7 +147,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	//clean up
-	delete[] mem;
+	munmap(mem, size);
 	close(fd);
 	util::PrintUsage(std::cout);
 

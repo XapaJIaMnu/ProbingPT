@@ -19,8 +19,8 @@
 
 int main() {
 
-  std::fstream backing("../source.uniq.rand.gz", std::ios::in);
-  util::FilePiece test(backing, NULL, 1);
+  //std::fstream backing("../source.uniq.rand.gz", std::ios::in);
+  util::FilePiece test("../source.uniq.rand.gz", NULL, 1);
   //An example of how not to read a file (try/catch), will change later, but for now, hacking
   while(true){
     try {

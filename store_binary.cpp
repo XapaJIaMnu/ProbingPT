@@ -18,6 +18,9 @@
 #include <boost/scoped_array.hpp>
 #include <boost/functional/hash.hpp>
 
+#include <ctime> //for timing.
+#include <chrono>
+
 //Hash table entry
 struct Entry {
 	uint64_t key;
@@ -119,6 +122,12 @@ line_text splitLine(StringPiece textin) {
 }
 
 int main(int argc, char* argv[]){
+
+	//Time everything
+	std::clock_t c_start = std::clock();
+	auto t_start = std::chrono::high_resolution_clock::now();
+
+
 	if (argc != 5) {
 		// Tell the user how to run the program
 		std::cerr << "Provided " << argc << " arguments, needed 4." << std::endl;
@@ -190,6 +199,15 @@ int main(int argc, char* argv[]){
 	os.close();
 	ram_container.clear();
 	delete[] mem;
+
+	//End timing
+	std::clock_t c_end = std::clock();
+	auto t_end = std::chrono::high_resolution_clock::now();
+
+	//Print timing results
+	std::cout << "CPU time used: "<< 1000.0 * (c_end-c_start) / CLOCKS_PER_SEC<< " ms\n";
+	std::cout << "Real time passed: "<< std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count()<< " ms\n";
+
 
 	util::PrintUsage(std::cout);
 	return 1;

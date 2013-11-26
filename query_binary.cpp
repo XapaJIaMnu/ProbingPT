@@ -23,6 +23,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <ctime> //for timing.
+#include <chrono>
 
 char * readTable(char * filename, size_t size);
 
@@ -36,10 +38,8 @@ uint64_t getHash(StringPiece text) {
 
 //Read table from disk, return memory map location
 char * readTable(char * filename, size_t size) {
-    std::cerr << "Mem map" << std::endl;
 	//Initial position of the file is the end of the file, thus we know the size
 	int fd;
-	//char *map;  // mmapped char array
 
 	//Find the size
 	struct stat filestatus;
@@ -134,6 +134,11 @@ int main(int argc, char* argv[]) {
 		if (cinstr == "exit"){
 			break;
 		}else{
+			//Time lookup
+			std::clock_t c_start = std::clock();
+			auto t_start = std::chrono::high_resolution_clock::now();
+
+			//Actual lookup
 			StringPiece tofind = StringPiece(cinstr);
 			key = getHash(cinstr);
 			found = table.Find(key, tmp);
@@ -143,7 +148,14 @@ int main(int argc, char* argv[]) {
 			} else {
 				std::cout << "Key not found!" << std::endl;
 			}
-			
+
+			//End timing
+			std::clock_t c_end = std::clock();
+			auto t_end = std::chrono::high_resolution_clock::now();
+
+			//Print timing results
+			std::cout << "CPU time used: "<< 1000.0 * (c_end-c_start) / CLOCKS_PER_SEC<< " ms\n";
+			std::cout << "Real time passed: "<< std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count()<< " ms\n";
 		}
 	}
 	//clean up

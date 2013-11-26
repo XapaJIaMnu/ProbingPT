@@ -148,6 +148,7 @@ int main(int argc, char* argv[]) {
 	}
 	//clean up
 	munmap(mem, size);
+	munmap(map, filesize);
 	close(fd);
 	util::PrintUsage(std::cout);
 

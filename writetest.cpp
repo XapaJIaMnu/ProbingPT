@@ -16,7 +16,8 @@ int main(){
 	std::ofstream os ("data.dat", std::ios::binary);
 
     int size1 = pesho.size();
-    os.write((const char*)&size1, 4);
+    std::cout << "SIze 1 is " << size1 << std::endl;
+    //os.write((const char*)&size1, 4);
     os.write((const char*)&pesho[0], size1 * sizeof(int));
     os.close();
 

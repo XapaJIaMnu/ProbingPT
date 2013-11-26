@@ -38,7 +38,7 @@ int main()
     
     /* Read the file int-by-int from the mmap
      */
-    for (i = 1; i <=array_length; ++i) {
+    for (i = 0; i <=array_length; ++i) {
 	printf("%d: %d\n", i, map[i]);
     }
 

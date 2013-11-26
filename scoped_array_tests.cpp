@@ -48,7 +48,7 @@ void readTable(char * filename, char *mem, size_t size);
 void readTable(char * filename, char *mem, size_t size) {
 	//Initial position of the file is the end of the file, thus we know the size
 	std::ifstream file (filename, std::ios::in|std::ios::binary);
-	file.read ((char *)*mem, size); // read
+	file.read ((char *)mem, size); // read
 	file.close();
 }
 
@@ -87,37 +87,30 @@ int main() {
 	Table table(mem, size);
 
 	table.Insert(entry1);
-	table.Insert(entry2);
+	entry1.key = key2;
+	entry1.value = num2;
+	table.Insert(entry1);
 
 	const Entry * find_num;
-	table.Find(key1, find_num);
-	std::cout << "Num 1 is " << find_num -> GetValue() << std::endl;
+	table.Find(key2, find_num);
+	std::cout << "Num 2 is " << find_num -> GetValue() << std::endl;
 
 	//Serialize to disk test
 	serialize_table(mem, size, "hashtable.dat");
 
 	//boost::scoped_array<char> read(new char[size]);
 	char* read = new char[size];
+	memset(read, 0, size);
 
 	readTable("hashtable.dat", read, size);
 
 	serialize_table(read, size, "readtable2.dat");
 
 	Table table2(read, size);
-	std::cout << "Table assigned! " << std::endl;
-	table2.CheckConsistency();
-	std::cout << "Table is consistent " << std::endl;
-
-	for (int i = 0; i < size; i++){
-		if (mem[i] == read[i]){
-		}else{
-			std::cout << "Error at " << i << std::endl;
-			break;
-		}
-	}
+	delete[] mem;
 
 	const Entry* find_num2;
-	table2.Find(key2, find_num2);
+	table2.Find(key1, find_num2);
 	std::cout << "Entry found! " << std::endl;
 	std::cout << "Num 1 is " << find_num2 -> GetValue() << std::endl;
 

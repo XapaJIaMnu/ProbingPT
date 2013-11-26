@@ -168,7 +168,7 @@ int main(int argc, char* argv[]){
 			it = vector_append(&line, &ram_container, it); //Put into the array and update iterator to the new end position
 
 			//Write to disk if over 10000
-			if (pesho.value > 9000) {
+			if (dist_from_start > 9000) {
 				std::cout << "Dist counter " << dist_from_start << std::endl;
 				std::cout << "Extra counter " << extra_counter << std::endl;
 				//write to memory

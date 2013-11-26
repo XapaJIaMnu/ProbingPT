@@ -34,19 +34,7 @@ uint64_t getHash(StringPiece text) {
 	return key;
 }
 
-/*
-void readTable(char * filename, char *mem, size_t size) {
-	std::cerr << "Normal IO" << std::endl;
-	//Initial position of the file is the end of the file, thus we know the size
-	std::ifstream file (filename, std::ios::in|std::ios::binary);
-	file.read ((char *)mem, size); // read
-	for (int i = 0; i < 10; i++){
-		std::cout << "First " << mem[i] << "Last " << mem[size-i] << std::endl;
-	}
-	file.close();
-}
-*/
-
+//Read table from disk, return memory map location
 char * readTable(char * filename, size_t size) {
     std::cerr << "Mem map" << std::endl;
 	//Initial position of the file is the end of the file, thus we know the size
@@ -58,8 +46,6 @@ char * readTable(char * filename, size_t size) {
 	stat(filename, &filestatus);
 	unsigned long filesize = filestatus.st_size;
 	int array_length = filesize/sizeof(char);
-	std::cout << "Table length detected is " << array_length << std::endl;
-	std::cout << "Table length calculated is " << size << std::endl;
 
 
 	fd = open(filename, O_RDONLY);
@@ -131,28 +117,14 @@ int main(int argc, char* argv[]) {
 	int tablesize = atoi(argv[3]);
 	size_t size = Table::Size(tablesize, 1.2);
 
+	//Read it from file
 	char * mem = readTable(argv[1], size);
 	Table table(mem, size);
-	for (int i = 0; i < 10; i++){
-		std::cout << "First " << mem[i] << "Last " << mem[size-i] << std::endl;
-	}
-	table.CheckConsistency();
-	std::cout << "Table is consistent!" << std::endl;
 
-	//Get a key;
-	StringPiece test = StringPiece("! ! ! !");
-	uint64_t key = getHash(test);
-
-	std::cout << "Hash is " << key << std::endl;
-
+	//For searching
 	const Entry * tmp;
-	bool keyfound = table.Find(key, tmp);
-	std::cout <<"Key found" << keyfound << std::endl;
-	//unsigned int idx = tmp -> GetValue();
-	//std::cout << "Index is " << idx << std::endl;
-	std::string test_str(&map[15], &map[115]);
-	std::cout << "String is " << test_str << std::endl;
-
+	uint64_t key;
+	
 	//Interactive search
 	std::cout << "Please enter a string to be searched, or exit to exit." << std::endl;
 	while (true){
@@ -167,7 +139,7 @@ int main(int argc, char* argv[]) {
 			found = table.Find(key, tmp);
 			if (found) {
 				std::string found(&map[tmp -> GetValue()] , &map[tmp -> GetValue()] + 100);
-				std::cout << "Integer corresponding to " << cinstr << " is " << found << std::endl;
+				std::cout << "Phrase corresponding to " << cinstr << " is:"  << std::endl << found << std::endl;
 			} else {
 				std::cout << "Key not found!" << std::endl;
 			}

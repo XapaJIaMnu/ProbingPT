@@ -17,11 +17,17 @@ cd lib/kenlm
 Now build the testsfiles with the following command:
 
 ```
-<clang++||g++> filename.cpp -I./ -L./lib/kenlm/lib/ -lkenlm -lz -lbz2 -llzma -o output.o
+<clang++||g++> filename.cpp helpers/*.cpp -I./ -L./lib/kenlm/lib/ -lkenlm -lz -lbz2 -llzma  -lboost_serialization -o output.o
 ```
 
 First alpha
 ------------
+
+Build both store_binary and query_binary:
+
+```
+<clang++||g++> filename.cpp -I./ -L./lib/kenlm/lib/ -lkenlm -lz -lbz2 -llzma -o output.o
+```
 
 After building you can create a phrase table by:
 

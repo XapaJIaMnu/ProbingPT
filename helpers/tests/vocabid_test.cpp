@@ -18,22 +18,25 @@ int main(int argc, char* argv[]){
 
 	//Used hashes
 	uint64_t num1 = getHash(StringPiece("Demo"));
-	uint64_t num2 = getHash(StringPiece("text"));
+	uint64_t num2 = getVocabID("text");
 	uint64_t num3 = getHash(StringPiece("with"));
-	uint64_t num4 = getHash(StringPiece("3"));
+	uint64_t num4 = getVocabID("3");
 	uint64_t num5 = getHash(StringPiece("elements"));
+	uint64_t num6 = 0;
 
 	//Tests
-	bool test1 = newmap.find(num1)->second == vocabids.find(num1)->second;
-	bool test2 = newmap.find(num2)->second == vocabids.find(num2)->second;
-	bool test3 = newmap.find(num3)->second == vocabids.find(num3)->second;
-	bool test4 = newmap.find(num4)->second == vocabids.find(num4)->second;
-	bool test5 = newmap.find(num5)->second == vocabids.find(num5)->second;
+	bool test1 = getStringFromID(&newmap, num1) == getStringFromID(&vocabids, num1);
+	bool test2 = getStringFromID(&newmap, num2) == getStringFromID(&vocabids, num2);
+	bool test3 = getStringFromID(&newmap, num3) == getStringFromID(&vocabids, num3);
+	bool test4 = getStringFromID(&newmap, num4) == getStringFromID(&vocabids, num4);
+	bool test5 = getStringFromID(&newmap, num5) == getStringFromID(&vocabids, num5);
+	bool test6 = getStringFromID(&newmap, num6) == getStringFromID(&vocabids, num6);
 
-	if (test1 && test2 && test3 && test4 && test5){
+
+	if (test1 && test2 && test3 && test4 && test5 && test6){
 		std::cout << "Map was successfully written and read!" << std::endl;
 	} else {
-		std::cout << "Error! " << test1 << " " << test2 << " " << test3 << " " << test4 << " " << test5 << " " << std::endl;
+		std::cout << "Error! " << test1 << " " << test2 << " " << test3 << " " << test4 << " " << test5 << " " << test6 << std::endl;
 	}
 	
 

@@ -27,3 +27,21 @@ void read_map(std::map<uint64_t, std::string> *karta, char* filename){
 	//Close the stream after we are done.
 	is.close();
 }
+
+// If necessary those methods could use StringPiece instead of std::string, I don't
+// know which is better.
+std::string getStringFromID(std::map<uint64_t, std::string> *karta, uint64_t id){
+	std::map<uint64_t, std::string>::iterator it;
+	it = karta->find(id);
+	if (it == karta->end()) {
+		return "STRING_NOT_FOUND";
+	} else {
+		return it->second;
+	} 
+}
+
+uint64_t getVocabID(std::string candidate){
+	std::size_t len = candidate.length();
+	uint64_t key = util::MurmurHashNative(candidate.c_str(), len);
+	return key;
+}

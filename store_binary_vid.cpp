@@ -24,13 +24,12 @@ std::vector<char>::iterator vector_append(line_text* input, std::vector<char>* o
 	int vec_size = 0;
 	int new_string_size = 0;
 
-	temp += input->target_phrase.as_string() + " " + input->prob.as_string() + " " + input->word_all1.as_string() + " " + input->word_all2.as_string();
 	if (new_entry){
-		//If we have a new entry, add carriage return at the end.
+		//If we have a new entry, add an empty line.
 		temp += '\n';
-	} else {
-		temp += ' ';
 	}
+
+	temp += input->target_phrase.as_string() + "\t" + input->prob.as_string() + "\t" + input->word_all1.as_string() + "\t" + input->word_all2.as_string() + "\n";
 	
 	//Put into vector
 	outputvec->insert(it, temp.begin(), temp.end());
@@ -77,6 +76,7 @@ int main(int argc, char* argv[]){
 	uint64_t extra_counter = 0; //After we reset the counter, we still want to keep track of the correct offset, so
 									//we should keep an extra counter for that reason.
 	line_text prev_line; //Check if the source phrase of the previous line is the same
+	int longestchars = 0; //Keep track of what is the maximum number of characters we need to read when quering
 
 
 	//Read everything and processs

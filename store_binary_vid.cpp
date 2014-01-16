@@ -16,9 +16,9 @@
 
 
 //Appends to the vector used for outputting.
-int vector_append(line_text *input, std::vector<char> *outputvec, bool new_entry);
+std::pair<std::vector<char>::iterator, int> vector_append(line_text *input, std::vector<char> *outputvec, bool new_entry);
 
-std::vector<char>::iterator vector_append(line_text* input, std::vector<char>* outputvec, std::vector<char>::iterator it, bool new_entry){
+std::pair<std::vector<char>::iterator, int> vector_append(line_text* input, std::vector<char>* outputvec, std::vector<char>::iterator it, bool new_entry){
 	//Append everything to one string
 	std::string temp = "";
 	int vec_size = 0;
@@ -35,7 +35,9 @@ std::vector<char>::iterator vector_append(line_text* input, std::vector<char>* o
 	outputvec->insert(it, temp.begin(), temp.end());
 
 	//Return new iterator updated iterator
-	return it+temp.length();
+	//Return iterator + length
+	std::pair<std::vector<char>::iterator, int> retvalues (it+temp.length(), temp.length());
+	return retvalues;
 }
 
 int main(int argc, char* argv[]){
@@ -72,11 +74,13 @@ int main(int argc, char* argv[]){
 	std::vector<char> ram_container;
 	ram_container.reserve(10000);
 	std::vector<char>::iterator it = ram_container.begin();
+	std::pair<std::vector<char>::iterator, int> binary_append_ret; //Return values from vector_append
 	unsigned int dist_from_start = 0;
 	uint64_t extra_counter = 0; //After we reset the counter, we still want to keep track of the correct offset, so
 									//we should keep an extra counter for that reason.
 	line_text prev_line; //Check if the source phrase of the previous line is the same
 	int longestchars = 0; //Keep track of what is the maximum number of characters we need to read when quering
+	int currentlong = 0; //How long is the current
 
 
 	//Read everything and processs
@@ -101,10 +105,22 @@ int main(int argc, char* argv[]){
 				//Put into table
 				table.Insert(pesho);
 				prev_line = line;
-				it = vector_append(&line, &ram_container, it, true); //Put into the array and update iterator to the new end position
+				binary_append_ret = vector_append(&line, &ram_container, it, true); //Put into the array and update iterator to the new end position
+				it = binary_append_ret.first;
+
+				//Keep track how long the vector append string for the current source entry is.
+				currentlong = currentlong + binary_append_ret.second;
+
 			} else{
 				add_to_map(&vocabids, line.target_phrase);
-				it = vector_append(&line, &ram_container, it, false); //Put into the array and update iterator to the new end position
+				binary_append_ret = vector_append(&line, &ram_container, it, false); //Put into the array and update iterator to the new end position
+				it = binary_append_ret.first;
+				//Keep track how long the vector append string for the current source entry is.
+				//We have started a new entry so we check if the old one is longer than the previous longest
+				if (currentlong > longestchars) {
+					longestchars = currentlong;
+				}
+				currentlong = binary_append_ret.second;
 			}
 
 			//Write to disk if over 10000
@@ -138,6 +154,9 @@ int main(int argc, char* argv[]){
 	//End timing
 	std::clock_t c_end = std::clock();
 	auto t_end = std::chrono::high_resolution_clock::now();
+
+	//Show how long is the longest entry:
+	std::cout << "Longest entry is " << longestchars << " character long!" << std::endl;
 
 	//Print timing results
 	std::cout << "CPU time used: "<< 1000.0 * (c_end-c_start) / CLOCKS_PER_SEC<< " ms\n";
@@ -185,10 +204,13 @@ bool test_vectorinsert() {
 	std::vector<char> container;
 	container.reserve(10000); //Reserve vector
 	std::vector<char>::iterator it = container.begin();
+	std::pair<std::vector<char>::iterator, int> binary_append_ret; //Return values from vector_append
 
 	//Put a value into the vector
-	it = vector_append(&output, &container, it, false);
-	it = vector_append(&output2, &container, it, false);
+	binary_append_ret = vector_append(&output, &container, it, false);
+	it = binary_append_ret.first;
+	binary_append_ret = vector_append(&output2, &container, it, false);
+	it = binary_append_ret.first;
 
 	std::string test(container.begin(), container.end());
 	std::string should_be = "! ! ! ! 0.0804289 0.141656 0.0804289 0.443409 2.718 0-0 1-1 2-2 3-3 1 1 1! ! ! ) - , a 0.0804289 0.0257627 0.0804289 0.00146736 2.718 0-0 1-1 2-2 3-3 4-4 4-5 5-6 1 1 1";

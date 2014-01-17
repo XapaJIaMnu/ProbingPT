@@ -167,32 +167,6 @@ int main(int argc, char* argv[]){
 	return 1;
 }
 
-bool test_tokenization(){
-	StringPiece line1 = StringPiece("! ! ! ! ||| ! ! ! ! ||| 0.0804289 0.141656 0.0804289 0.443409 2.718 ||| 0-0 1-1 2-2 3-3 ||| 1 1 1");
-	StringPiece line2 = StringPiece("! ! ! ) , has ||| ! ! ! ) - , a ||| 0.0804289 0.0257627 0.0804289 0.00146736 2.718 ||| 0-0 1-1 2-2 3-3 4-4 4-5 5-6 ||| 1 1 1");
-	StringPiece line3 = StringPiece("! ! ! ) , ||| ! ! ! ) - , ||| 0.0804289 0.075225 0.0804289 0.00310345 2.718 ||| 0-0 1-1 2-2 3-3 4-4 4-5 ||| 1 1 1");
-	StringPiece line4 = StringPiece("! ! ! ) ||| ! ! ! ) . ||| 0.0804289 0.177547 0.0268096 0.000872597 2.718 ||| 0-0 1-1 2-2 3-3 ||| 1 3 1");
-
-	line_text output1 = splitLine(line1);
-	line_text output2 = splitLine(line2);
-	line_text output3 = splitLine(line3);
-	line_text output4 = splitLine(line4);
-
-	bool test1 = output1.prob == StringPiece("0.0804289 0.141656 0.0804289 0.443409 2.718");
-	bool test2 = output2.word_all1 == StringPiece("0-0 1-1 2-2 3-3 4-4 4-5 5-6");
-	bool test3 = output2.target_phrase == StringPiece("! ! ! ) - , a");
-	bool test4 = output3.source_phrase == StringPiece("! ! ! ) ,");
-	bool test5 = output4.word_all2 == StringPiece("1 3 1");
-
-	//std::cout << test1 << " " << test2 << " " << test3 << " " << test4 << std::endl;
-
-	if (test1 && test2 && test3 && test4 && test5){
-		return true;
-	}else{
-		return false;
-	}
-
-}
 
 bool test_vectorinsert() {
 	StringPiece line1 = StringPiece("! ! ! ! ||| ! ! ! ! ||| 0.0804289 0.141656 0.0804289 0.443409 2.718 ||| 0-0 1-1 2-2 3-3 ||| 1 1 1");
@@ -218,21 +192,5 @@ bool test_vectorinsert() {
 		return true;
 	} else {
 		return false;
-	}
-}
-
-void test(){
-	bool test_res = test_tokenization();
-	bool test_res2 = test_vectorinsert();
-	if (test_res){
-		std::cout << "Test passes" << std::endl;
-	} else {
-		std::cout << "Tokenization test fails" << std::endl;
-	}
-
-	if (test_res2){
-		std::cout << "Test passes" << std::endl;
-	} else {
-		std::cout << "Vector insert test fails" << std::endl;
 	}
 }

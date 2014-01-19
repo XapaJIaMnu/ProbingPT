@@ -1,7 +1,8 @@
 #include "../util/string_piece.hh"
 #include "../util/tokenize_piece.hh"
 #include <vector>
-#include <stdlib.h>
+#include <stdlib.h> //atof
+#include "vocabid.hh"
 
 //Struct for holding processed line
 struct line_text {
@@ -14,10 +15,10 @@ struct line_text {
 
 //Struct for holding processed line
 struct target_text {
-	int target_phrase;
-	std::vector<double> * prob;
-	std::vector<int> * word_all1;
-	std::vector<int> * word_all2;
+	std::vector<uint64_t> target_phrase;
+	std::vector<double> prob;
+	std::vector<int> word_all1;
+	std::vector<int> word_all2;
 };
 
 //Ask if it's better to have it receive a pointer to a line_text struct

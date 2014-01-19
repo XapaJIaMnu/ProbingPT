@@ -45,3 +45,17 @@ uint64_t getVocabID(std::string candidate){
 	uint64_t key = util::MurmurHashNative(candidate.c_str(), len);
 	return key;
 }
+
+std::vector<uint64_t> getVocabIDs(StringPiece textin){
+	//Tokenize
+	std::vector<uint64_t> output;
+
+	util::TokenIter<util::SingleCharacter> it(textin, util::SingleCharacter(' '));
+
+	while(it){
+		output.push_back(getHash(*it));
+		it++;
+	}
+
+	return output;
+}

@@ -23,3 +23,6 @@ void read_map(std::map<uint64_t, std::string> *karta, char* filename);
 std::string getStringFromID(std::map<uint64_t, std::string> *karta, uint64_t id);
 
 uint64_t getVocabID(std::string candidate);
+
+//Get vocab iDs from a whole target fraze.
+std::vector<uint64_t> getVocabIDs(StringPiece textin);

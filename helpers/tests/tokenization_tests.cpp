@@ -123,8 +123,45 @@ bool test_tokenization(){
 
 }
 
+bool test_linesplitter(){
+	StringPiece line1 = StringPiece("! &#93;	0.0738539 0.901133 0.0738539 0.65207 2.718	0-0 1-1	1 1 1");
+	target_text ans1;
+	ans1 = splitSingleTargetLine(line1);
+
+	/* For testing purposes
+	std::cout << ans1.target_phrase[0] << " " <<ans1.target_phrase[1] << " Size: " << ans1.target_phrase.size() << std::endl;
+	std::cout << ans1.word_all1[3] << " " << ans1.word_all2[2] << " " << ans1.prob[3] << std::endl; */
+
+	return (ans1.target_phrase.size() == 2 && ans1.prob.size() == 5 && ans1.word_all1.size() == 4 && ans1.word_all2.size() == 3);
+}
+
+bool test_linessplitter(){
+	StringPiece line1 = StringPiece("! &#93;	0.0738539 0.901133 0.0738539 0.65207 2.718	0-0 1-1	1 1 1\n\n! ) . proto doÅ¡lo	0.0738539 7.14446e-06");
+	StringPiece line2 = StringPiece("! &quot; )	0.536553 0.75961 0.634108 0.532927 2.718	0-0 1-1 2-2	13 11 8\n! ) .	0.0369269 0.00049839 0.00671399 0.00372884 2.718	0-0 1-1 2-1 2-2	2 11 1\n&quot; ! )	0.0738539 0.75961 0.00671399 0.532927 2.718	1-0 0-1 2-2	1 11 1\nse ! &quot; )	0.0738539 0.75961 0.00671399 0.0225211 2.718	0-1 1-2 2-3	1 11 1\n\n! &quot; , a to	0.0738539 0.0894238 0.0738539 0.048");
+
+	std::vector<target_text> ans1;
+	std::vector<target_text> ans2;
+
+	ans1 = splitTargetLine(line1);
+	ans2 = splitTargetLine(line2);
+
+	bool sizes = ans1.size() == 1 && ans2.size() == 4;
+	bool prob = ans1[0].prob[3] == 0.65207 && ans2[1].prob[1] == 0.00049839;
+	bool word_alls = ans2[0].word_all2[1] == 11 && ans2[3].word_all1[5] == 3;
+
+	/* FOr testing
+	std::cout << ans1.size() << std::endl;
+	std::cout << ans2.size() << std::endl;
+	std::cout << ans1[0].prob[3] << std::endl;
+	std::cout << ans2[1].prob[1] << std::endl;
+	std::cout << ans2[0].word_all2[1] << std::endl;
+	std::cout << ans2[3].word_all1[5] << std::endl; */
+
+	return sizes && prob && word_alls;
+}
+
 int main(){
-	if (probabilitiesTest() && wordAll1test() && wordAll2test() && test_tokenization()){
+	if (probabilitiesTest() && wordAll1test() && wordAll2test() && test_tokenization() && test_linesplitter() && test_linessplitter()){
 		std::cout << "All tests pass!" << std::endl;
 	} else {
 		std::cout << "Failiure in some tests!" << std::endl;

@@ -9,7 +9,7 @@
 //Hash table entry
 struct Entry {
 	uint64_t key;
-	typedef unsigned char Key;
+	typedef uint64_t Key;
 
 	uint64_t GetKey() const {
 		return key;

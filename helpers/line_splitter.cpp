@@ -86,31 +86,46 @@ std::vector<int> splitWordAll2(StringPiece textin){
 target_text splitSingleTargetLine(StringPiece textin){
 	const char delim[] = "\t";
 	target_text output;
-	StringPiece targetphrase;
-	StringPiece prob;
-	StringPiece wordall1;
-	StringPiece wordall2;
 
 	//Split on elements:
 	util::TokenIter<util::MultiCharacter> it(textin, util::MultiCharacter(delim));
 
 	//Get target phrase
-	targetphrase = *it;
+	output.target_phrase = getVocabIDs(*it);
 	it++;
 
 	//Get probabilities
-	prob = *it;
+	output.prob = splitProbabilities(*it);
 	it++;
 
 	//Get wordall1
-	wordall1 = *it;
+	output.word_all1 = splitWordAll1(*it);
 	it++;
 
 	//Get wordall2
-	wordall2 = *it;
+	output.word_all2 = splitWordAll2(*it);
 
 	return output;
 
 }
 
-std::vector<target_text> splitTargetLine(StringPiece textin);
+std::vector<target_text> splitTargetLine(StringPiece textin){
+	const char delim[] = "\n\n";
+	const char delim2[] = "\n";
+	std::vector<target_text> output;
+	StringPiece all_entries;
+
+	//Split on two new lines, get the whole entry
+	util::TokenIter<util::MultiCharacter> it(textin, util::MultiCharacter(delim));
+	all_entries = *it;
+
+	//Split on new line, split multiple target lines
+	util::TokenIter<util::MultiCharacter> it2(*it, util::MultiCharacter(delim2));
+	while (it2){
+		//std::cout << *it2;
+		output.push_back(splitSingleTargetLine(*it2));
+		it2++;
+	}
+
+	return output;
+}

@@ -107,7 +107,7 @@ int main(int argc, char* argv[]){
 				std::vector<uint64_t> vocabid_source = getVocabIDs(line.source_phrase);
 				//SLOW TO THE POINT OF IMPRACTICAL
 				//pesho.key = util::MurmurHashNative(&vocabid_source[0], vocabid_source.size());
-				//FOr loop to get the key related to the hashes:
+				//NEw approach. Init the key to zero and then add the hashes of from the vector. Works MUCH faster.
 				for (int i = 0; i < vocabid_source.size(); i++){
 					pesho.key += vocabid_source[i];
 				}

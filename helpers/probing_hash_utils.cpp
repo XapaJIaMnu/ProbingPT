@@ -4,6 +4,7 @@
 char * readTable(char * filename, size_t size) {
 	//Initial position of the file is the end of the file, thus we know the size
 	int fd;
+	char * map;
 
 	fd = open(filename, O_RDONLY);
 	if (fd == -1) {
@@ -11,7 +12,15 @@ char * readTable(char * filename, size_t size) {
 		exit(EXIT_FAILURE);
 	}
 
-	return (char *)mmap(0, size, PROT_READ, MAP_SHARED, fd, 0);
+	map = (char *)mmap(0, size, PROT_READ, MAP_SHARED, fd, 0);
+
+	if (map == MAP_FAILED) {
+		close(fd);
+		perror("Error mmapping the file");
+		exit(EXIT_FAILURE);
+	}
+
+	return map;
 } 
 
 

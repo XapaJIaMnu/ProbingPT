@@ -122,7 +122,11 @@ std::vector<target_text> splitTargetLine(StringPiece textin){
 	//Split on new line, split multiple target lines
 	util::TokenIter<util::MultiCharacter> it2(*it, util::MultiCharacter(delim2));
 	while (it2){
-		//std::cout << *it2;
+		if (it2->size() < 3){
+			//Skip empty lines. Necessary for last line.
+			it2++;
+			continue;
+		}
 		output.push_back(splitSingleTargetLine(*it2));
 		it2++;
 	}

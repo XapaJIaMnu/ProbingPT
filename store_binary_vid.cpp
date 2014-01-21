@@ -103,6 +103,7 @@ int main(int argc, char* argv[]){
 				/*Old version! New version hashes an array of vocabIDs
 				pesho.key = getHash(line.source_phrase);
 				*/
+				pesho.key=0;
 				std::vector<uint64_t> vocabid_source = getVocabIDs(line.source_phrase);
 				//SLOW TO THE POINT OF IMPRACTICAL
 				//pesho.key = util::MurmurHashNative(&vocabid_source[0], vocabid_source.size());

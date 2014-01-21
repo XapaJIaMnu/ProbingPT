@@ -100,7 +100,16 @@ int main(int argc, char* argv[]){
 				//Create an entry to keep track of the offset
 				Entry pesho;
 				pesho.value = dist_from_start + extra_counter;
+				/*Old version! New version hashes an array of vocabIDs
 				pesho.key = getHash(line.source_phrase);
+				*/
+				std::vector<uint64_t> vocabid_source = getVocabIDs(line.source_phrase);
+				//SLOW TO THE POINT OF IMPRACTICAL
+				//pesho.key = util::MurmurHashNative(&vocabid_source[0], vocabid_source.size());
+				//FOr loop to get the key related to the hashes:
+				for (int i = 0; i < vocabid_source.size(); i++){
+					pesho.key += vocabid_source[i];
+				}
 
 				//Put into table
 				table.Insert(pesho);

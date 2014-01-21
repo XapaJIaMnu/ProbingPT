@@ -40,6 +40,14 @@ std::string getStringFromID(std::map<uint64_t, std::string> *karta, uint64_t id)
 	} 
 }
 
+std::string getStringFromIDs(std::map<uint64_t, std::string> *karta, std::vector<uint64_t> ids){
+	std::string output = "";
+	for (int i = 0; i < ids.size(); i++){
+		output = output + getStringFromID(karta, ids[i]) + " ";
+	}
+	return output;
+}
+
 uint64_t getVocabID(std::string candidate){
 	std::size_t len = candidate.length();
 	uint64_t key = util::MurmurHashNative(candidate.c_str(), len);

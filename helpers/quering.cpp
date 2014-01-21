@@ -35,7 +35,7 @@ QueryEngine::QueryEngine(char * path_to_hashtable, char * path_to_data_bin, char
 	//Read hashtable
 	int tablesize = atoi(tablesize_ch);
 	size_t table_filesize = Table::Size(tablesize, 1.2);
-	char * mem = readTable(path_to_hashtable, table_filesize);
+	mem = readTable(path_to_hashtable, table_filesize);
 	Table table_init(mem, table_filesize);
 	table = table_init;
 
@@ -46,11 +46,9 @@ QueryEngine::QueryEngine(char * path_to_hashtable, char * path_to_data_bin, char
 }
 
 QueryEngine::~QueryEngine(){
-	std::cout << "TODO! IMPLEMENT DESTRUCTOR!" << std::endl;
-	/*stub
-	munmap(mem, size);
-	*/
+	//Clear mmap content from memory.
 	munmap(binary_mmaped, binary_filesize);
+	munmap(mem, table_filesize);
 	
 }
 
@@ -133,4 +131,36 @@ std::pair<bool, std::vector<target_text>> QueryEngine::query(StringPiece source_
 
 	return output;
 
+}
+
+void QueryEngine::printTargetInfo(std::vector<target_text> target_phrases){
+	int entries = target_phrases.size();
+
+	for (int i = 0; i<entries; i++){
+		std::cout << "Entry " << i+1 << " of " << entries << ":" << std::endl;
+		//Print text
+		std::cout << getStringFromIDs(&vocabids, target_phrases[i].target_phrase) << "\t";
+		
+		//Print probabilities:
+		for (int j = 0; j<target_phrases[i].prob.size(); j++){
+			std::cout << target_phrases[i].prob[j] << " ";
+		}
+		std::cout << "\t";
+
+		//Print word_all1
+		for (int j = 0; j<target_phrases[i].word_all1.size(); j++){
+			if (j%2 == 0){
+				std::cout << target_phrases[i].word_all1[j] << "-";
+			}else{
+				std::cout << target_phrases[i].word_all1[j] << " ";
+			}
+		}
+		std::cout << "\t";
+
+		//print word_all2
+		for (int j = 0; j<target_phrases[i].word_all2.size(); j++){
+			std::cout << target_phrases[i].word_all1[j] << " ";
+		}
+		std::cout << std::endl;
+	}
 }

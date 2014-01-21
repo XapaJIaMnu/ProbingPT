@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 			query_result = queries.query(StringPiece(cinstr));
 
 			if (query_result.first) {
-				std::cout << "Key found! TODO. Print result" << std::endl;
+				queries.printTargetInfo(query_result.second);
 			} else {
 				std::cout << "Key not found!" << std::endl;
 			}
@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	//clean up
-	std::cout << "CLEANUP NOT WORKING, FIX!" << std::endl;
+	std::cout << "FIXME: Should destructor be called or will the object be destroyed automatically?" << std::endl;
 	//delete queries;
 
 	util::PrintUsage(std::cout);

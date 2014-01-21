@@ -1,12 +1,9 @@
 #include "quering.hh"
 
-char * read_binary_file(char * filename){
+char * read_binary_file(char * filename, size_t filesize){
 	//Get filesize
 	int fd;
 	char * map;
-	struct stat filestatus;
-	unsigned long filesize = filestatus.st_size;
-	stat(filename, &filestatus);
 
 	fd = open(filename, O_RDONLY);
 
@@ -16,6 +13,11 @@ char * read_binary_file(char * filename){
 	}
 
 	map = (char *)mmap(0, filesize, PROT_READ, MAP_SHARED, fd, 0);
+	if (map == MAP_FAILED) {
+		close(fd);
+		perror("Error mmapping the file");
+		exit(EXIT_FAILURE);
+	}
 
 	return map;
 } 
@@ -25,13 +27,16 @@ QueryEngine::QueryEngine(char * path_to_hashtable, char * path_to_data_bin, char
 	largest_entry = atoi(largest_entry_ch);
 
 	//Mmap binary table
-	binary_mmaped = read_binary_file(path_to_data_bin);
-	
+	struct stat filestatus;
+	stat(path_to_data_bin, &filestatus);
+	binary_filesize = filestatus.st_size;
+	binary_mmaped = read_binary_file(path_to_data_bin, binary_filesize);
+
 	//Read hashtable
 	int tablesize = atoi(tablesize_ch);
-	size_t size = Table::Size(tablesize, 1.2);
-	char * mem = readTable(path_to_hashtable, size);
-	Table table_init(mem, size);
+	size_t table_filesize = Table::Size(tablesize, 1.2);
+	char * mem = readTable(path_to_hashtable, table_filesize);
+	Table table_init(mem, table_filesize);
 	table = table_init;
 
 	//Read vocabid
@@ -44,8 +49,9 @@ QueryEngine::~QueryEngine(){
 	std::cout << "TODO! IMPLEMENT DESTRUCTOR!" << std::endl;
 	/*stub
 	munmap(mem, size);
-	munmap(map, filesize);
 	*/
+	munmap(binary_mmaped, binary_filesize);
+	
 }
 
 std::pair<bool, std::vector<target_text>> QueryEngine::query(std::vector<uint64_t> source_phrase){
@@ -66,7 +72,14 @@ std::pair<bool, std::vector<target_text>> QueryEngine::query(std::vector<uint64_
 		//The phrase that was searched for was found! We need to get the translation entries.
 		//We will read the largest entry in bytes and then filter the unnecesarry with functions
 		//from line_splitter
-		std::string text_entry(&binary_mmaped[entry -> GetValue()] , &binary_mmaped[entry -> GetValue()] + largest_entry);
+		uint64_t initial_index = entry -> GetValue();
+		uint64_t end_index = initial_index + largest_entry;
+		//At the end of the file we can't readd + largest_entry cause we get a segfault.
+		//Instead read till the end of the file.
+		if (end_index > binary_filesize){
+			end_index = binary_filesize;
+		}
+		std::string text_entry(&binary_mmaped[initial_index] , &binary_mmaped[end_index]);
 		StringPiece raw_string = StringPiece(text_entry);
 
 		//Get only the translation entries necessary
@@ -100,7 +113,15 @@ std::pair<bool, std::vector<target_text>> QueryEngine::query(StringPiece source_
 		//The phrase that was searched for was found! We need to get the translation entries.
 		//We will read the largest entry in bytes and then filter the unnecesarry with functions
 		//from line_splitter
-		std::string text_entry(&binary_mmaped[entry -> GetValue()] , &binary_mmaped[entry -> GetValue()] + largest_entry);
+
+		uint64_t initial_index = entry -> GetValue();
+		uint64_t end_index = initial_index + largest_entry;
+		//At the end of the file we can't readd + largest_entry cause we get a segfault.
+		//Instead read till the end of the file.
+		if (end_index > binary_filesize){
+			end_index = binary_filesize;
+		}
+		std::string text_entry(&binary_mmaped[initial_index] , &binary_mmaped[end_index]);
 		StringPiece raw_string = StringPiece(text_entry);
 
 		//Get only the translation entries necessary

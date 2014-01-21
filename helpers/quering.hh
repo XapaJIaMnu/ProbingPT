@@ -11,6 +11,8 @@ class QueryEngine {
 	std::map<uint64_t, std::string> vocabids;
 	Table table;
 	int largest_entry; //Size of largest entry, for reading from binary_mmaped when quering
+	size_t binary_filesize;
+	size_t table_filesize;
 	public:
 		QueryEngine (char *, char *, char *, char *, char *);
 		~QueryEngine();

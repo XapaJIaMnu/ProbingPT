@@ -18,7 +18,7 @@ void serialize_map(std::map<uint64_t, std::string> *karta, char* filename){
 	os.close();
 }
 
-void read_map(std::map<uint64_t, std::string> *karta, char* filename){
+void read_map(std::map<uint64_t, std::string> *karta, const char* filename){
 	std::ifstream is (filename, std::ios::binary);
 	boost::archive::text_iarchive iarch(is);
 

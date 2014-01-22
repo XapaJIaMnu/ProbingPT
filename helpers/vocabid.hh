@@ -17,7 +17,7 @@ void add_to_map(std::map<uint64_t, std::string> *karta, StringPiece textin);
 
 void serialize_map(std::map<uint64_t, std::string> *karta, char* filename);
 
-void read_map(std::map<uint64_t, std::string> *karta, char* filename);
+void read_map(std::map<uint64_t, std::string> *karta, const char* filename);
 
 // If necessary those methods could use StringPiece instead of std::string, I don't
 // know which is better.

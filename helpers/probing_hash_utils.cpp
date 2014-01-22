@@ -1,7 +1,7 @@
 #include "probing_hash_utils.hh"
 
 //Read table from disk, return memory map location
-char * readTable(char * filename, size_t size) {
+char * readTable(const char * filename, size_t size) {
 	//Initial position of the file is the end of the file, thus we know the size
 	int fd;
 	char * map;

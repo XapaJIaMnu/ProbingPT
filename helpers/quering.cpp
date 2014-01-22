@@ -1,6 +1,6 @@
 #include "quering.hh"
 
-char * read_binary_file(char * filename, size_t filesize){
+char * read_binary_file(const char * filename, size_t filesize){
 	//Get filesize
 	int fd;
 	char * map;
@@ -22,7 +22,7 @@ char * read_binary_file(char * filename, size_t filesize){
 	return map;
 } 
 
-QueryEngine::QueryEngine(char * path_to_hashtable, char * path_to_data_bin, char * path_to_vocabid, char * tablesize_ch, char * largest_entry_ch){
+QueryEngine::QueryEngine(const char * path_to_hashtable, const char * path_to_data_bin, const char * path_to_vocabid, const char * tablesize_ch, const char * largest_entry_ch){
 	//set largest entry
 	largest_entry = atoi(largest_entry_ch);
 
@@ -52,7 +52,7 @@ QueryEngine::~QueryEngine(){
 	
 }
 
-std::pair<bool, std::vector<target_text>> QueryEngine::query(std::vector<uint64_t> source_phrase){
+std::pair<bool, std::vector<target_text> > QueryEngine::query(std::vector<uint64_t> source_phrase){
 	bool found;
 	std::vector<target_text> translation_entries;
 	const Entry * entry;
@@ -85,13 +85,13 @@ std::pair<bool, std::vector<target_text>> QueryEngine::query(std::vector<uint64_
 
 	}
 
-	std::pair<bool, std::vector<target_text>> output (found, translation_entries);
+	std::pair<bool, std::vector<target_text> > output (found, translation_entries);
 
 	return output;
 	
 }
 
-std::pair<bool, std::vector<target_text>> QueryEngine::query(StringPiece source_phrase){
+std::pair<bool, std::vector<target_text> > QueryEngine::query(StringPiece source_phrase){
 	bool found;
 	std::vector<target_text> translation_entries;
 	const Entry * entry;
@@ -127,7 +127,7 @@ std::pair<bool, std::vector<target_text>> QueryEngine::query(StringPiece source_
 
 	}
 
-	std::pair<bool, std::vector<target_text>> output (found, translation_entries);
+	std::pair<bool, std::vector<target_text> > output (found, translation_entries);
 
 	return output;
 

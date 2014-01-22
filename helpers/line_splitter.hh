@@ -1,5 +1,6 @@
 #include "../util/string_piece.hh"
 #include "../util/tokenize_piece.hh"
+#include "../util/file_piece.hh"
 #include <vector>
 #include <stdlib.h> //atof
 #include "vocabid.hh"
@@ -20,6 +21,12 @@ struct target_text {
 	std::vector<int> word_all1;
 	std::vector<int> word_all2;
 };
+
+//Appends to the vector used for outputting.
+std::pair<std::vector<char>::iterator, int> vector_append(line_text* input, std::vector<char>* outputvec, std::vector<char>::iterator it, bool new_entry);
+
+//Find maximum number of lines
+unsigned long getUniqLines(char * filepath);
 
 //Ask if it's better to have it receive a pointer to a line_text struct
 line_text splitLine(StringPiece textin);

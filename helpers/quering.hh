@@ -18,7 +18,7 @@ class QueryEngine {
 	size_t binary_filesize;
 	size_t table_filesize;
 	public:
-		QueryEngine (const char *, const char *, const char *, const char *, const char *);
+		QueryEngine (const char *);
 		~QueryEngine();
 		std::pair<bool, std::vector<target_text> > query(StringPiece source_phrase);
 		std::pair<bool, std::vector<target_text> > query(std::vector<uint64_t> source_phrase);

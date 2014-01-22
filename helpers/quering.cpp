@@ -22,25 +22,38 @@ char * read_binary_file(const char * filename, size_t filesize){
 	return map;
 } 
 
-QueryEngine::QueryEngine(const char * path_to_hashtable, const char * path_to_data_bin, const char * path_to_vocabid, const char * tablesize_ch, const char * largest_entry_ch){
-	//set largest entry
-	largest_entry = atoi(largest_entry_ch);
+QueryEngine::QueryEngine(const char * filepath){
+	
+	//Create filepaths
+	std::string basepath(filepath);
+	std::string path_to_hashtable = basepath + "/probing_hash.dat";
+	std::string path_to_data_bin = basepath + "/binfile.dat";
+	std::string path_to_vocabid = basepath + "/vocabid.dat";
+
+	//Read config file
+	std::string line;
+	std::ifstream config (basepath + "/config");
+	getline(config, line);
+	int tablesize = atoi(line.c_str()); //Get tablesize.
+
+	getline(config, line);
+	largest_entry = atoi(line.c_str()); //Set largest_entry.
+	config.close();
 
 	//Mmap binary table
 	struct stat filestatus;
-	stat(path_to_data_bin, &filestatus);
+	stat(path_to_data_bin.c_str(), &filestatus);
 	binary_filesize = filestatus.st_size;
-	binary_mmaped = read_binary_file(path_to_data_bin, binary_filesize);
+	binary_mmaped = read_binary_file(path_to_data_bin.c_str(), binary_filesize);
 
 	//Read hashtable
-	int tablesize = atoi(tablesize_ch);
 	size_t table_filesize = Table::Size(tablesize, 1.2);
-	mem = readTable(path_to_hashtable, table_filesize);
+	mem = readTable(path_to_hashtable.c_str(), table_filesize);
 	Table table_init(mem, table_filesize);
 	table = table_init;
 
 	//Read vocabid
-	read_map(&vocabids, path_to_vocabid);
+	read_map(&vocabids, path_to_vocabid.c_str());
 
 	std::cout << "Initialized successfully! " << std::endl;
 }

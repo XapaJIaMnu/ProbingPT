@@ -31,13 +31,13 @@
 #include <chrono>
 
 int main(int argc, char* argv[]) {
-	if (argc != 6) {
+	if (argc != 2) {
 		// Tell the user how to run the program
-		std::cerr << "Usage: " << argv[0] << " path_to_hashtable path_to_data_bin path_to_vocabid tablesize max_entry_size" << std::endl;
+		std::cerr << "Usage: " << argv[0] << " path_to_directory" << std::endl;
 		return 1;
 	}
 
-	QueryEngine queries(argv[1], argv[2], argv[3], argv[4], argv[5]);
+	QueryEngine queries(argv[1]);
 
 	//Interactive search
 	std::cout << "Please enter a string to be searched, or exit to exit." << std::endl;

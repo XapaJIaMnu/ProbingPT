@@ -1,5 +1,32 @@
 #include "helpers/line_splitter.hh" 
 
+bool test_vectorinsert() {
+	StringPiece line1 = StringPiece("! ! ! ! ||| ! ! ! ! ||| 0.0804289 0.141656 0.0804289 0.443409 2.718 ||| 0-0 1-1 2-2 3-3 ||| 1 1 1");
+	StringPiece line2 = StringPiece("! ! ! ) , has ||| ! ! ! ) - , a ||| 0.0804289 0.0257627 0.0804289 0.00146736 2.718 ||| 0-0 1-1 2-2 3-3 4-4 4-5 5-6 ||| 1 1 1");
+	line_text output = splitLine(line1);
+	line_text output2 = splitLine(line2);
+
+	//Init container vector and iterator.
+	std::vector<char> container;
+	container.reserve(10000); //Reserve vector
+	std::vector<char>::iterator it = container.begin();
+	std::pair<std::vector<char>::iterator, int> binary_append_ret; //Return values from vector_append
+
+	//Put a value into the vector
+	binary_append_ret = vector_append(&output, &container, it, false);
+	it = binary_append_ret.first;
+	binary_append_ret = vector_append(&output2, &container, it, false);
+	it = binary_append_ret.first;
+
+	std::string test(container.begin(), container.end());
+	std::string should_be = "! ! ! ! 0.0804289 0.141656 0.0804289 0.443409 2.718 0-0 1-1 2-2 3-3 1 1 1! ! ! ) - , a 0.0804289 0.0257627 0.0804289 0.00146736 2.718 0-0 1-1 2-2 3-3 4-4 4-5 5-6 1 1 1";
+	if (test == should_be) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
 bool probabilitiesTest(){
 	StringPiece line1 = StringPiece("0.536553 0.75961 0.634108 0.532927 2.718");
 	StringPiece line2 = StringPiece("1.42081e-05 3.91895e-09 0.0738539 0.749514 2.718");
@@ -161,7 +188,7 @@ bool test_linessplitter(){
 }
 
 int main(){
-	if (probabilitiesTest() && wordAll1test() && wordAll2test() && test_tokenization() && test_linesplitter() && test_linessplitter()){
+	if (probabilitiesTest() && wordAll1test() && wordAll2test() && test_tokenization() && test_linesplitter() && test_linessplitter() && test_vectorinsert()){
 		std::cout << "All tests pass!" << std::endl;
 	} else {
 		std::cout << "Failiure in some tests!" << std::endl;

@@ -13,32 +13,7 @@
 #include "helpers/line_splitter.hh"
 #include "helpers/probing_hash_utils.hh"
 #include "helpers/vocabid.hh"
-
-
-//Appends to the vector used for outputting.
-std::pair<std::vector<char>::iterator, int> vector_append(line_text *input, std::vector<char> *outputvec, bool new_entry);
-
-std::pair<std::vector<char>::iterator, int> vector_append(line_text* input, std::vector<char>* outputvec, std::vector<char>::iterator it, bool new_entry){
-	//Append everything to one string
-	std::string temp = "";
-	int vec_size = 0;
-	int new_string_size = 0;
-
-	if (new_entry){
-		//If we have a new entry, add an empty line.
-		temp += '\n';
-	}
-
-	temp += input->target_phrase.as_string() + "\t" + input->prob.as_string() + "\t" + input->word_all1.as_string() + "\t" + input->word_all2.as_string() + "\n";
-	
-	//Put into vector
-	outputvec->insert(it, temp.begin(), temp.end());
-
-	//Return new iterator updated iterator
-	//Return iterator + length
-	std::pair<std::vector<char>::iterator, int> retvalues (it+temp.length(), temp.length());
-	return retvalues;
-}
+#include <sys/stat.h> //mkdir
 
 int main(int argc, char* argv[]){
 
@@ -47,19 +22,27 @@ int main(int argc, char* argv[]){
 	auto t_start = std::chrono::high_resolution_clock::now();
 
 
-	if (argc != 6) {
+	if (argc != 3) {
 		// Tell the user how to run the program
-		std::cerr << "Provided " << argc << " arguments, needed 4." << std::endl;
-		std::cerr << "Usage: " << argv[0] << " path_to_phrasetable number_of_uniq_lines output_bin_file output_hash_table output_vocab_id" << std::endl;
+		std::cerr << "Provided " << argc << " arguments, needed 3." << std::endl;
+		std::cerr << "Usage: " << argv[0] << " path_to_phrasetable output_dir" << std::endl;
+		//std::cerr << "Usage: " << argv[0] << " path_to_phrasetable number_of_uniq_lines output_bin_file output_hash_table output_vocab_id" << std::endl;
 		return 1;
 	}
 
+	//Get uniq lines:
+	unsigned long uniq_entries = getUniqLines(argv[1]);
+
+	//Get basepath and create directory if missing
+	std::string basepath(argv[2]);
+	std::cout << basepath << std::endl;
+	mkdir(basepath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+
 	//Read the file
 	util::FilePiece filein(argv[1]);
-	int tablesize = atoi(argv[2]);
 
 	//Init the table
-	size_t size = Table::Size(tablesize, 1.2);
+	size_t size = Table::Size(uniq_entries, 1.2);
 	char * mem = new char[size];
 	memset(mem, 0, size);
 	Table table(mem, size);
@@ -68,7 +51,7 @@ int main(int argc, char* argv[]){
 	std::map<uint64_t, std::string> vocabids;
 
 	//Output binary
-	std::ofstream os (argv[3], std::ios::binary);
+	std::ofstream os ((basepath + "/binfile.dat"), std::ios::binary);
 	
 	//Vector with 10000 elements, after the 9000nd we swap to disk, we have 10000 for buffer
 	std::vector<char> ram_container;
@@ -150,7 +133,7 @@ int main(int argc, char* argv[]){
 		}
 	}
 
-	serialize_table(mem, size, argv[4]);
+	serialize_table(mem, size, (basepath + "/probing_hash.dat").c_str());
 	
 	//clean up
 	os.close();
@@ -158,8 +141,14 @@ int main(int argc, char* argv[]){
 	delete[] mem;
 
 	//Serialize vocabids
-	serialize_map(&vocabids, argv[5]);
+	serialize_map(&vocabids, (basepath + "/vocabid.dat").c_str());
 	vocabids.clear();
+
+	//Write configfile
+	std::ofstream configfile;
+	configfile.open(basepath + "/config");
+	configfile << uniq_entries << '\n' << longestchars*10;
+	configfile.close();
 
 	//End timing
 	std::clock_t c_end = std::clock();
@@ -177,30 +166,3 @@ int main(int argc, char* argv[]){
 	return 1;
 }
 
-
-bool test_vectorinsert() {
-	StringPiece line1 = StringPiece("! ! ! ! ||| ! ! ! ! ||| 0.0804289 0.141656 0.0804289 0.443409 2.718 ||| 0-0 1-1 2-2 3-3 ||| 1 1 1");
-	StringPiece line2 = StringPiece("! ! ! ) , has ||| ! ! ! ) - , a ||| 0.0804289 0.0257627 0.0804289 0.00146736 2.718 ||| 0-0 1-1 2-2 3-3 4-4 4-5 5-6 ||| 1 1 1");
-	line_text output = splitLine(line1);
-	line_text output2 = splitLine(line2);
-
-	//Init container vector and iterator.
-	std::vector<char> container;
-	container.reserve(10000); //Reserve vector
-	std::vector<char>::iterator it = container.begin();
-	std::pair<std::vector<char>::iterator, int> binary_append_ret; //Return values from vector_append
-
-	//Put a value into the vector
-	binary_append_ret = vector_append(&output, &container, it, false);
-	it = binary_append_ret.first;
-	binary_append_ret = vector_append(&output2, &container, it, false);
-	it = binary_append_ret.first;
-
-	std::string test(container.begin(), container.end());
-	std::string should_be = "! ! ! ! 0.0804289 0.141656 0.0804289 0.443409 2.718 0-0 1-1 2-2 3-3 1 1 1! ! ! ) - , a 0.0804289 0.0257627 0.0804289 0.00146736 2.718 0-0 1-1 2-2 3-3 4-4 4-5 5-6 1 1 1";
-	if (test == should_be) {
-		return true;
-	} else {
-		return false;
-	}
-}

@@ -25,6 +25,55 @@ line_text splitLine(StringPiece textin) {
 }
 
 
+unsigned long getUniqLines(char * filepath){
+	//Read the file
+	util::FilePiece filein(filepath);
+
+	unsigned long uniq_lines = 0;
+	line_text prev_line;
+
+	while (true){
+		line_text new_line;
+		try {
+			//Process line read
+			new_line = splitLine(filein.ReadLine());
+		} catch (util::EndOfFileException e){
+			std::cout << "End of file" << std::endl;
+			break;
+		}
+		if (new_line.source_phrase == prev_line.source_phrase){
+			continue;
+		} else {
+			uniq_lines++;
+			prev_line = new_line;
+		}
+	}
+
+	return uniq_lines;
+} 
+
+std::pair<std::vector<char>::iterator, int> vector_append(line_text* input, std::vector<char>* outputvec, std::vector<char>::iterator it, bool new_entry){
+	//Append everything to one string
+	std::string temp = "";
+	int vec_size = 0;
+	int new_string_size = 0;
+
+	if (new_entry){
+		//If we have a new entry, add an empty line.
+		temp += '\n';
+	}
+
+	temp += input->target_phrase.as_string() + "\t" + input->prob.as_string() + "\t" + input->word_all1.as_string() + "\t" + input->word_all2.as_string() + "\n";
+	
+	//Put into vector
+	outputvec->insert(it, temp.begin(), temp.end());
+
+	//Return new iterator updated iterator
+	//Return iterator + length
+	std::pair<std::vector<char>::iterator, int> retvalues (it+temp.length(), temp.length());
+	return retvalues;
+}
+
 std::vector<double> splitProbabilities(StringPiece textin){
 	const char delim[] = " ";
 	std::vector<double> output;

@@ -25,7 +25,7 @@ line_text splitLine(StringPiece textin) {
 }
 
 
-unsigned long getUniqLines(char * filepath){
+unsigned long getUniqLines(const char * filepath){
 	//Read the file
 	util::FilePiece filein(filepath);
 
@@ -38,7 +38,7 @@ unsigned long getUniqLines(char * filepath){
 			//Process line read
 			new_line = splitLine(filein.ReadLine());
 		} catch (util::EndOfFileException e){
-			std::cout << "End of file" << std::endl;
+			std::cerr << "Unique entries counted: ";
 			break;
 		}
 		if (new_line.source_phrase == prev_line.source_phrase){
@@ -48,6 +48,8 @@ unsigned long getUniqLines(char * filepath){
 			prev_line = new_line;
 		}
 	}
+
+	std::cerr << uniq_lines << std::endl;
 
 	return uniq_lines;
 } 

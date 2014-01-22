@@ -26,7 +26,7 @@ struct target_text {
 std::pair<std::vector<char>::iterator, int> vector_append(line_text* input, std::vector<char>* outputvec, std::vector<char>::iterator it, bool new_entry);
 
 //Find maximum number of lines
-unsigned long getUniqLines(char * filepath);
+unsigned long getUniqLines(const char * filepath);
 
 //Ask if it's better to have it receive a pointer to a line_text struct
 line_text splitLine(StringPiece textin);

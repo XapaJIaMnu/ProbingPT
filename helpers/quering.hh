@@ -20,8 +20,8 @@ class QueryEngine {
 	public:
 		QueryEngine (char *, char *, char *, char *, char *);
 		~QueryEngine();
-		std::pair<bool, std::vector<target_text>> query(StringPiece source_phrase);
-		std::pair<bool, std::vector<target_text>> query(std::vector<uint64_t> source_phrase);
+		std::pair<bool, std::vector<target_text> > query(StringPiece source_phrase);
+		std::pair<bool, std::vector<target_text> > query(std::vector<uint64_t> source_phrase);
 		void printTargetInfo(std::vector<target_text> target_phrases);
 
 };

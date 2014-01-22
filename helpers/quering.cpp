@@ -52,7 +52,7 @@ QueryEngine::~QueryEngine(){
 	
 }
 
-std::pair<bool, std::vector<target_text>> QueryEngine::query(std::vector<uint64_t> source_phrase){
+std::pair<bool, std::vector<target_text> > QueryEngine::query(std::vector<uint64_t> source_phrase){
 	bool found;
 	std::vector<target_text> translation_entries;
 	const Entry * entry;
@@ -85,13 +85,13 @@ std::pair<bool, std::vector<target_text>> QueryEngine::query(std::vector<uint64_
 
 	}
 
-	std::pair<bool, std::vector<target_text>> output (found, translation_entries);
+	std::pair<bool, std::vector<target_text> > output (found, translation_entries);
 
 	return output;
 	
 }
 
-std::pair<bool, std::vector<target_text>> QueryEngine::query(StringPiece source_phrase){
+std::pair<bool, std::vector<target_text> > QueryEngine::query(StringPiece source_phrase){
 	bool found;
 	std::vector<target_text> translation_entries;
 	const Entry * entry;
@@ -127,7 +127,7 @@ std::pair<bool, std::vector<target_text>> QueryEngine::query(StringPiece source_
 
 	}
 
-	std::pair<bool, std::vector<target_text>> output (found, translation_entries);
+	std::pair<bool, std::vector<target_text> > output (found, translation_entries);
 
 	return output;
 

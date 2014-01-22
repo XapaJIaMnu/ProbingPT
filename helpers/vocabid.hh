@@ -5,6 +5,7 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <fstream>
 #include <iostream>
+#include <vector>
 
 #include <map> //Container
 #include "hash.hh" //Hash of elements

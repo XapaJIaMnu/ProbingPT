@@ -23,6 +23,8 @@ class QueryEngine {
 		std::pair<bool, std::vector<target_text> > query(StringPiece source_phrase);
 		std::pair<bool, std::vector<target_text> > query(std::vector<uint64_t> source_phrase);
 		void printTargetInfo(std::vector<target_text> target_phrases);
+  	    const std::map<uint64_t, std::string> getVocab() const
+  	    { return vocabids; }
 
 };
 

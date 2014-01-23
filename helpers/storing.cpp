@@ -21,7 +21,7 @@ void createProbingPT(const char * phrasetable_path, const char * target_path){
 	std::map<uint64_t, std::string> vocabids;
 
 	//Output binary
-	std::ofstream os ((basepath + "/binfile.dat"), std::ios::binary);
+	std::ofstream os ((basepath + "/binfile.dat").c_str(), std::ios::binary);
 	
 	//Vector with 10000 elements, after the 9000nd we swap to disk, we have 10000 for buffer
 	std::vector<char> ram_container;
@@ -116,7 +116,7 @@ void createProbingPT(const char * phrasetable_path, const char * target_path){
 
 	//Write configfile
 	std::ofstream configfile;
-	configfile.open(basepath + "/config");
+	configfile.open((basepath + "/config").c_str());
 	configfile << uniq_entries << '\n' << longestchars;
 	std::cerr << "Longest char sequence detected is: " << longestchars << std::endl;
 	configfile.close();

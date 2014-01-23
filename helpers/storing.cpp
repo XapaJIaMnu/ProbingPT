@@ -71,19 +71,19 @@ void createProbingPT(const char * phrasetable_path, const char * target_path){
 				binary_append_ret = vector_append(&line, &ram_container, it, true); //Put into the array and update iterator to the new end position
 				it = binary_append_ret.first;
 
-				//Keep track how long the vector append string for the current source entry is.
-				currentlong = currentlong + binary_append_ret.second;
-
-			} else{
-				add_to_map(&vocabids, line.target_phrase);
-				binary_append_ret = vector_append(&line, &ram_container, it, false); //Put into the array and update iterator to the new end position
-				it = binary_append_ret.first;
-				//Keep track how long the vector append string for the current source entry is.
 				//We have started a new entry so we check if the old one is longer than the previous longest
 				if (currentlong > longestchars) {
 					longestchars = currentlong;
 				}
 				currentlong = binary_append_ret.second;
+
+			} else{
+				add_to_map(&vocabids, line.target_phrase);
+				binary_append_ret = vector_append(&line, &ram_container, it, false); //Put into the array and update iterator to the new end position
+				it = binary_append_ret.first;
+
+				//Keep track how long the vector append string for the current source entry is.
+				currentlong = currentlong + binary_append_ret.second;
 			}
 
 			//Write to disk if over 10000
@@ -117,7 +117,7 @@ void createProbingPT(const char * phrasetable_path, const char * target_path){
 	//Write configfile
 	std::ofstream configfile;
 	configfile.open(basepath + "/config");
-	configfile << uniq_entries << '\n' << longestchars*10;
+	configfile << uniq_entries << '\n' << longestchars;
 	std::cerr << "Longest char sequence detected is: " << longestchars << std::endl;
 	configfile.close();
 }

@@ -32,7 +32,7 @@ QueryEngine::QueryEngine(const char * filepath){
 
 	//Read config file
 	std::string line;
-	std::ifstream config (basepath + "/config");
+	std::ifstream config ((basepath + "/config").c_str());
 	getline(config, line);
 	int tablesize = atoi(line.c_str()); //Get tablesize.
 

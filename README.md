@@ -20,6 +20,12 @@ Now build the testsfiles with the following command:
 <clang++||g++> filename.cpp helpers/*.cpp -I./ -L./lib/kenlm/lib/ -lkenlm -lz -lbz2 -llzma  -lboost_serialization -o output.o
 ```
 
+To create the library that links into Moses:
+ln -s ~/workspace/boost/boost_1_55_0 boost
+cd helpers
+./compile-lib.sh 
+
+
 First alpha
 ------------
 

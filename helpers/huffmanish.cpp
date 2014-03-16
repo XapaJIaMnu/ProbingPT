@@ -263,6 +263,39 @@ void Huffman::produce_lookups(){
 	}
 }
 
+HuffmanDecoder::HuffmanDecoder (const char * dirname){
+	//Read the maps from disk
+
+	//Note that directory name should exist.
+	std::string basedir(dirname);
+	std::string target_phrase_path(basedir + "/target_phrases");
+	std::string probabilities_path(basedir + "/probs");
+	std::string word_all1_path(basedir + "/Wall1");
+	std::string word_all2_path(basedir + "/Wall2");
+
+	//Target phrases
+	std::ifstream is (target_phrase_path, std::ios::binary);
+	boost::archive::text_iarchive iarch(is);
+	iarch >> lookup_target_phrase;
+	is.close();
+
+	//Probabilities
+	std::ifstream is1 (probabilities_path, std::ios::binary);
+	boost::archive::text_iarchive iarch1(is1);
+	iarch1 >> lookup_probabilities;
+	is1.close();
+
+	//Word allignment 1 & 2
+	std::ifstream is2 (word_all1_path, std::ios::binary);
+	boost::archive::text_iarchive iarch2(is2);
+	iarch2 >> lookup_word_all1;
+	is2.close();
+
+	std::ifstream is3 (word_all2_path, std::ios::binary);
+	boost::archive::text_iarchive iarch3(is3);
+	iarch3 >> lookup_word_all2;
+	is3.close();
+}
 
 HuffmanDecoder::HuffmanDecoder (std::map<unsigned int, std::string> * lookup_target, std::map<unsigned int, std::string> * lookup_prob,
 	 std::map<unsigned int, std::string> * lookup_word1, std::map<unsigned int, std::string> * lookup_word2) {

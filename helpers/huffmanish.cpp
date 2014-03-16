@@ -311,7 +311,7 @@ inline std::string getTargetWordFromID(unsigned int id, std::map<unsigned int, s
 std::string getTargetWordsFromIDs(std::vector<unsigned int> ids, std::map<unsigned int, std::string> * lookup_target_phrase) {
 	std::string returnstring;
 	for (std::vector<unsigned int>::iterator it = ids.begin(); it != ids.end(); it++){
-		returnstring.append(getTargetWordFromID(*it), lookup_target_phrase);
+		returnstring.append(getTargetWordFromID(*it, lookup_target_phrase));
 	}
 
 	return returnstring;
@@ -332,3 +332,83 @@ inline float reinterpret_uint(unsigned int * num){
 	converted_num = reinterpret_cast<float *>(num);
 	return *converted_num;
 }
+
+/*Mostly taken from stackoverflow, http://stackoverflow.com/questions/5858646/optimizing-variable-length-encoding
+and modified in order to return a vector of chars. Implements ULEB128 or variable byte encoding.
+This is highly optimized version with unrolled loop */
+std::vector<unsigned char> vbyte_encode(unsigned int num){
+	//Determine how many bytes we are going to take.
+	short size;
+	std::vector<unsigned char> byte_vector;
+
+	if (num < 0x00000080U) {
+		size = 1;
+		byte_vector.reserve(size);
+		goto b1;
+	}
+	if (num < 0x00004000U) {
+		size = 2;
+		byte_vector.reserve(size);
+		goto b2;
+	}
+	if (num < 0x00200000U) {
+		size = 3;
+		byte_vector.reserve(size);
+		goto b3;
+	}
+	if (num < 0x10000000U) {
+		size = 4;
+		byte_vector.reserve(size);
+		goto b4;
+	}
+	size = 5;
+	byte_vector.reserve(size);
+
+
+	//Now proceed with the encoding.
+	byte_vector.push_back((num & 0x7f) | 0x80);
+	num >>= 7;
+b4:
+	byte_vector.push_back((num & 0x7f) | 0x80);
+	num >>= 7;
+b3:
+	byte_vector.push_back((num & 0x7f) | 0x80);
+	num >>= 7;
+b2:
+	byte_vector.push_back((num & 0x7f) | 0x80);
+	num >>= 7;
+b1:
+	byte_vector.push_back(num);
+
+	return byte_vector;
+}
+
+std::vector<unsigned int> vbyte_decode(std::vector<unsigned char> line){
+	std::vector<unsigned int> huffman_line;
+	std::vector<unsigned char> current_num;
+
+	for (std::vector<unsigned char>::iterator it = line.begin(); it != line.end(); it++){
+		current_num.push_back(*it);
+		if ((*it >> 7) != 1) {
+			//We don't have continuation in the next bit
+			huffman_line.push_back(bytes_to_int(current_num));
+			current_num.clear();
+		}
+	}
+	return huffman_line;
+}
+
+unsigned int bytes_to_int(std::vector<unsigned char> number){
+	unsigned int retvalue = 0;
+	std::vector<unsigned char>::iterator it = number.begin();
+	unsigned char shift = 0; //By how many bits to shift
+
+	while (it != number.end()) {
+		retvalue |= (*it & 0x7f) << shift;
+		shift += 7;
+		it++;
+	}
+
+	return retvalue;
+}
+

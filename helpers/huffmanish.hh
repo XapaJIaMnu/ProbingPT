@@ -92,3 +92,7 @@ inline std::string getTargetWordFromID(unsigned int id, std::map<unsigned int, s
 inline unsigned int reinterpret_float(float * num);
 
 inline float reinterpret_uint(unsigned int * num);
+
+std::vector<unsigned char> vbyte_encode(unsigned int num);
+std::vector<unsigned int> vbyte_decode(std::vector<unsigned char> line);
+unsigned int bytes_to_int(std::vector<unsigned char> number);

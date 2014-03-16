@@ -1,5 +1,5 @@
 #include "quering.hh"
-
+/*
 char * read_binary_file(const char * filename, size_t filesize){
 	//Get filesize
 	int fd;
@@ -177,3 +177,4 @@ void QueryEngine::printTargetInfo(std::vector<target_text> target_phrases){
 		std::cout << std::endl;
 	}
 }
+*/

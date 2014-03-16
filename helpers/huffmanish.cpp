@@ -51,24 +51,6 @@ void Huffman::count_elements(line_text linein){
 		it++;
 	}
 
-	//For probabilities
-
-	util::TokenIter<util::SingleCharacter> probit(linein.prob, util::SingleCharacter(' '));
-	while (probit) {
-		//Check if we have that entry
-		std::map<std::string, unsigned int>::iterator mapiter2;
-		mapiter2 = probabilities.find(probit->as_string());
-
-		if (mapiter2 != probabilities.end()){
-			//If the element is found, increment the count.
-			mapiter2->second++;
-		} else {
-			//Else create a new entry;
-			probabilities.insert(std::pair<std::string, unsigned int>(probit->as_string(), 1));
-		}
-		probit++;
-	}
-
 	//For word allignment 1
 	std::map<std::string, unsigned int>::iterator mapiter3;
 	mapiter3 = word_all1.find(linein.word_all1.as_string());
@@ -107,13 +89,6 @@ void Huffman::assign_values() {
 	//Sort it
 	std::sort(target_phrase_words_counts.begin(), target_phrase_words_counts.end(), sort_pair());
 
-	//Create a vector for probabilities
-	for(std::map<std::string, unsigned int>::iterator it = probabilities.begin(); it != probabilities.end(); it++ ) {
-		probabilities_counts.push_back(*it);
-	}
-	//Sort it
-	std::sort(probabilities_counts.begin(), probabilities_counts.end(), sort_pair());
-
 	//Create a vector for word allignments 1
 	for(std::map<std::string, unsigned int>::iterator it = word_all1.begin(); it != word_all1.end(); it++ ) {
 		word_all1_counts.push_back(*it);
@@ -139,17 +114,8 @@ void Huffman::assign_values() {
 	std::cerr << "Maximum huffman code for target prases is: " << i << std::endl;
 	std::cerr << "Word 25 is: " << target_phrase_words_counts[25].first << " count is " << target_phrase_words_counts[25].second << std::endl;
 
-	std::cerr << "prob 25 is: " << probabilities_counts[25].first << " count is " << probabilities_counts[25].second << std::endl;
 	std::cerr << "word_all1 25 is: " << word_all1_counts[25].first << " count is " << word_all1_counts[25].second << std::endl;
 	std::cerr << "word_all2 25 is: " << word_all2_counts[25].first << " count is " << word_all2_counts[25].second << std::endl;
-
-	i = 1; //Reset i for the next map
-	for(std::vector<std::pair<std::string, unsigned int> >::iterator it = probabilities_counts.begin();
-	 it != probabilities_counts.end(); it++){
-		probabilities_huffman.insert(std::pair<std::string, unsigned int>(it->first, i));
-		i++; //Go to the next huffman code
-	}
-	std::cerr << "Maximum huffman code for probabilities is: " << i << std::endl;
 
 	i = 1; //Reset i for the next map
 	for(std::vector<std::pair<std::string, unsigned int> >::iterator it = word_all1_counts.begin();
@@ -169,12 +135,10 @@ void Huffman::assign_values() {
 
 	//After lookups are produced, clear some memory usage of objects not needed anymore.
 	target_phrase_words.clear();
-	probabilities.clear();
 	word_all1.clear();
 	word_all2.clear();
 
 	target_phrase_words_counts.clear();
-	probabilities_counts.clear();
 	word_all1_counts.clear();
 	word_all2_counts.clear();
 
@@ -193,12 +157,6 @@ void Huffman::serialize_maps(const char * dirname){
 	boost::archive::text_oarchive oarch(os);
 	oarch << lookup_target_phrase;
 	os.close();
-
-	//Target probabilities
-	std::ofstream os1 (probabilities_path, std::ios::binary);
-	boost::archive::text_oarchive oarch1(os1);
-	oarch1 << lookup_probabilities;
-	os1.close();
 
 	//Word all1
 	std::ofstream os2 (word_all1_path, std::ios::binary);
@@ -225,14 +183,16 @@ std::vector<unsigned int> Huffman::encode_line(line_text line){
 	//Add a zero;
 	retvector.push_back(0);
 
-	//Get target_phrase first.
+	//Get probabilities. Reinterpreting the float bytes as unsgined int.
 	util::TokenIter<util::SingleCharacter> probit(line.prob, util::SingleCharacter(' '));
 	while (probit) {
-		retvector.push_back(probabilities_huffman.find(probit->as_string())->second);
+		float num = std::stof(probit->as_string());
+		retvector.push_back(reinterpret_float(&num));
 		probit++;
 	}
 	//Add a zero;
 	retvector.push_back(0);
+
 
 	//Get Word allignments
 	retvector.push_back(word_all1_huffman.find(line.word_all1.as_string())->second);
@@ -250,10 +210,6 @@ void Huffman::produce_lookups(){
 		lookup_target_phrase.insert(std::pair<unsigned int, std::string>(it->second, it->first));
 	}
 
-	for(std::map<std::string, unsigned int>::iterator it = probabilities_huffman.begin(); it != probabilities_huffman.end(); it++ ) {
-		lookup_probabilities.insert(std::pair<unsigned int, std::string>(it->second, it->first));
-	}
-
 	for(std::map<std::string, unsigned int>::iterator it = word_all1_huffman.begin(); it != word_all1_huffman.end(); it++ ) {
 		lookup_word_all1.insert(std::pair<unsigned int, std::string>(it->second, it->first));
 	}
@@ -269,7 +225,6 @@ HuffmanDecoder::HuffmanDecoder (const char * dirname){
 	//Note that directory name should exist.
 	std::string basedir(dirname);
 	std::string target_phrase_path(basedir + "/target_phrases");
-	std::string probabilities_path(basedir + "/probs");
 	std::string word_all1_path(basedir + "/Wall1");
 	std::string word_all2_path(basedir + "/Wall2");
 
@@ -278,12 +233,6 @@ HuffmanDecoder::HuffmanDecoder (const char * dirname){
 	boost::archive::text_iarchive iarch(is);
 	iarch >> lookup_target_phrase;
 	is.close();
-
-	//Probabilities
-	std::ifstream is1 (probabilities_path, std::ios::binary);
-	boost::archive::text_iarchive iarch1(is1);
-	iarch1 >> lookup_probabilities;
-	is1.close();
 
 	//Word allignment 1 & 2
 	std::ifstream is2 (word_all1_path, std::ios::binary);
@@ -297,10 +246,9 @@ HuffmanDecoder::HuffmanDecoder (const char * dirname){
 	is3.close();
 }
 
-HuffmanDecoder::HuffmanDecoder (std::map<unsigned int, std::string> * lookup_target, std::map<unsigned int, std::string> * lookup_prob,
+HuffmanDecoder::HuffmanDecoder (std::map<unsigned int, std::string> * lookup_target,
 	 std::map<unsigned int, std::string> * lookup_word1, std::map<unsigned int, std::string> * lookup_word2) {
 	lookup_target_phrase = *lookup_target;
-	lookup_probabilities = *lookup_prob;
 	lookup_word_all1 = *lookup_word1;
 	lookup_word_all2 = *lookup_word2;
 }
@@ -336,7 +284,7 @@ target_text HuffmanDecoder::decode_line (std::vector<unsigned int> input){
 
 	//Decode probabilities
 	for (std::vector<unsigned int>::iterator it = probs.begin(); it != probs.end(); it++){
-		ret.prob.push_back(atof(lookup_probabilities.find(*it)->second.c_str()));
+		ret.prob.push_back(reinterpret_uint(&(*it)));
 	}
 
 	return ret;
@@ -354,4 +302,33 @@ std::string HuffmanDecoder::getTargetWordsFromIDs(std::vector<unsigned int> ids)
 	}
 
 	return returnstring;
+}
+
+inline std::string getTargetWordFromID(unsigned int id, std::map<unsigned int, std::string> * lookup_target_phrase) {
+	return lookup_target_phrase->find(id)->second;
+}
+
+std::string getTargetWordsFromIDs(std::vector<unsigned int> ids, std::map<unsigned int, std::string> * lookup_target_phrase) {
+	std::string returnstring;
+	for (std::vector<unsigned int>::iterator it = ids.begin(); it != ids.end(); it++){
+		returnstring.append(getTargetWordFromID(*it), lookup_target_phrase);
+	}
+
+	return returnstring;
+}
+
+/*Those functions are used to more easily store the floats in the binary phrase table
+ We convert the float unsinged int so that it is the same as our other values and we can
+ apply variable byte encoding on top of it.*/
+
+inline unsigned int reinterpret_float(float * num){
+	unsigned int * converted_num;
+	converted_num = reinterpret_cast<unsigned int *>(num);
+	return *converted_num;
+}
+
+inline float reinterpret_uint(unsigned int * num){
+	float * converted_num;
+	converted_num = reinterpret_cast<float *>(num);
+	return *converted_num;
 }

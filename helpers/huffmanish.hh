@@ -18,25 +18,21 @@ class Huffman {
 
 	//Containers used when counting the occurence of a given phrase
 	std::map<std::string, unsigned int> target_phrase_words;
-	std::map<std::string, unsigned int> probabilities;
 	std::map<std::string, unsigned int> word_all1;
 	std::map<std::string, unsigned int> word_all2;
 
 	//Same containers as vectors, for sorting
 	std::vector<std::pair<std::string, unsigned int> > target_phrase_words_counts;
-	std::vector<std::pair<std::string, unsigned int> > probabilities_counts;
 	std::vector<std::pair<std::string, unsigned int> > word_all1_counts;
 	std::vector<std::pair<std::string, unsigned int> > word_all2_counts;
 
 	//Huffman maps
 	std::map<std::string, unsigned int> target_phrase_huffman;
-	std::map<std::string, unsigned int> probabilities_huffman;
 	std::map<std::string, unsigned int> word_all1_huffman;
 	std::map<std::string, unsigned int> word_all2_huffman;
 
 	//inverted maps
 	std::map<unsigned int, std::string> lookup_target_phrase;
-	std::map<unsigned int, std::string> lookup_probabilities;
 	std::map<unsigned int, std::string> lookup_word_all1;
 	std::map<unsigned int, std::string> lookup_word_all2;
 
@@ -53,9 +49,6 @@ class Huffman {
 		const std::map<unsigned int, std::string> get_target_lookup_map() const{
 			return lookup_target_phrase;
 		}
-		const std::map<unsigned int, std::string> get_probabilities_lookup_map() const{
-			return lookup_probabilities;
-		}
 		const std::map<unsigned int, std::string> get_word_all1_lookup_map() const{
 			return lookup_word_all1;
 		}
@@ -66,21 +59,17 @@ class Huffman {
 
 class HuffmanDecoder {
 	std::map<unsigned int, std::string> lookup_target_phrase;
-	std::map<unsigned int, std::string> lookup_probabilities;
 	std::map<unsigned int, std::string> lookup_word_all1;
 	std::map<unsigned int, std::string> lookup_word_all2;
 
 public:
 	HuffmanDecoder (const char *);
-	HuffmanDecoder (std::map<unsigned int, std::string> *, std::map<unsigned int, std::string> *,
+	HuffmanDecoder (std::map<unsigned int, std::string> *,
 	 std::map<unsigned int, std::string> *, std::map<unsigned int, std::string> *);
 
 	//Getters
 	const std::map<unsigned int, std::string> get_target_lookup_map() const{
 		return lookup_target_phrase;
-	}
-	const std::map<unsigned int, std::string> get_probabilities_lookup_map() const{
-		return lookup_probabilities;
 	}
 	const std::map<unsigned int, std::string> get_word_all1_lookup_map() const{
 		return lookup_word_all1;
@@ -95,3 +84,11 @@ public:
 
 	target_text decode_line (std::vector<unsigned int> input);
 };
+
+std::string getTargetWordsFromIDs(std::vector<unsigned int> ids, std::map<unsigned int, std::string> * lookup_target_phrase);
+
+inline std::string getTargetWordFromID(unsigned int id, std::map<unsigned int, std::string> * lookup_target_phrase);
+
+inline unsigned int reinterpret_float(float * num);
+
+inline float reinterpret_uint(unsigned int * num);

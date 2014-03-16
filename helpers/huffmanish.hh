@@ -1,20 +1,16 @@
 //Huffman encodes a line and also produces the vocabulary ids
 #include "line_splitter.hh"
 #include "vocabid.hh"
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
 
 //Sorting for the second
 struct sort_pair {
 	bool operator()(const std::pair<std::string, unsigned int> &left, const std::pair<std::string, unsigned int> &right) {
 		return left.second > right.second; //This puts biggest numbers first.
 	}
-};
-
-//Struct for holding processed line
-struct target_text_huffman {
-	std::vector<unsigned int> target_phrase;
-	std::vector<double> prob;
-	std::vector<int> word_all1;
-	std::vector<int> word_all2;
 };
 
 class Huffman {
@@ -48,10 +44,12 @@ class Huffman {
 		Huffman (const char *);
 		void count_elements (line_text line);
 		void assign_values();
-		void serialize_maps();
+		void serialize_maps(const char * dirname);
 		void produce_lookups();
 
 		std::vector<unsigned int> encode_line(line_text line);
+
+		//Getters
 		const std::map<unsigned int, std::string> get_target_lookup_map() const{
 			return lookup_target_phrase;
 		}
@@ -77,5 +75,23 @@ public:
 	HuffmanDecoder (std::map<unsigned int, std::string> *, std::map<unsigned int, std::string> *,
 	 std::map<unsigned int, std::string> *, std::map<unsigned int, std::string> *);
 
-	target_text_huffman decode_line (std::vector<unsigned int> input);
+	//Getters
+	const std::map<unsigned int, std::string> get_target_lookup_map() const{
+		return lookup_target_phrase;
+	}
+	const std::map<unsigned int, std::string> get_probabilities_lookup_map() const{
+		return lookup_probabilities;
+	}
+	const std::map<unsigned int, std::string> get_word_all1_lookup_map() const{
+		return lookup_word_all1;
+	}
+	const std::map<unsigned int, std::string> get_word_all2_lookup_map() const{
+		return lookup_word_all2;
+	}
+
+	inline std::string getTargetWordFromID(unsigned int id);
+
+	std::string getTargetWordsFromIDs(std::vector<unsigned int> ids);
+
+	target_text decode_line (std::vector<unsigned int> input);
 };

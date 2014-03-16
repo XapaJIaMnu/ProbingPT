@@ -16,8 +16,8 @@ struct line_text {
 
 //Struct for holding processed line
 struct target_text {
-	std::vector<uint64_t> target_phrase;
-	std::vector<double> prob;
+	std::vector<unsigned int> target_phrase;
+	std::vector<float> prob;
 	std::vector<int> word_all1;
 	std::vector<int> word_all2;
 };
@@ -36,7 +36,7 @@ std::vector<target_text> splitTargetLine(StringPiece textin);
 
 target_text splitSingleTargetLine(StringPiece textin);
 
-std::vector<double> splitProbabilities(StringPiece textin);
+std::vector<float> splitProbabilities(StringPiece textin);
 
 std::vector<int> splitWordAll1(StringPiece textin);
 

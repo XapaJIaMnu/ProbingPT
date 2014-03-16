@@ -10,11 +10,6 @@ Huffman::Huffman (const char * filepath) {
 	while (true){
 		line_text new_line;
 
-		if (num_lines == 100000){
-			std::cout << "Line number " << num_lines << std::endl;
-			break;
-		}
-
 		num_lines++;
 
 		try {
@@ -171,10 +166,51 @@ void Huffman::assign_values() {
 		i++; //Go to the next huffman code
 	}
 	std::cerr << "Maximum huffman code for word all2 is: " << i << std::endl;
+
+	//After lookups are produced, clear some memory usage of objects not needed anymore.
+	target_phrase_words.clear();
+	probabilities.clear();
+	word_all1.clear();
+	word_all2.clear();
+
+	target_phrase_words_counts.clear();
+	probabilities_counts.clear();
+	word_all1_counts.clear();
+	word_all2_counts.clear();
+
 }
 
-void Huffman::serialize_maps(){
-	std::cerr << "STUB!" << std::endl;
+void Huffman::serialize_maps(const char * dirname){
+	//Note that directory name should exist.
+	std::string basedir(dirname);
+	std::string target_phrase_path(basedir + "/target_phrases");
+	std::string probabilities_path(basedir + "/probs");
+	std::string word_all1_path(basedir + "/Wall1");
+	std::string word_all2_path(basedir + "/Wall2");
+
+	//Target phrase
+	std::ofstream os (target_phrase_path, std::ios::binary);
+	boost::archive::text_oarchive oarch(os);
+	oarch << lookup_target_phrase;
+	os.close();
+
+	//Target probabilities
+	std::ofstream os1 (probabilities_path, std::ios::binary);
+	boost::archive::text_oarchive oarch1(os1);
+	oarch1 << lookup_probabilities;
+	os1.close();
+
+	//Word all1
+	std::ofstream os2 (word_all1_path, std::ios::binary);
+	boost::archive::text_oarchive oarch2(os2);
+	oarch2 << lookup_word_all1;
+	os2.close();
+
+	//Word all2
+	std::ofstream os3 (word_all2_path, std::ios::binary);
+	boost::archive::text_oarchive oarch3(os3);
+	oarch3 << lookup_word_all2;
+	os3.close();
 }
 
 std::vector<unsigned int> Huffman::encode_line(line_text line){
@@ -236,14 +272,15 @@ HuffmanDecoder::HuffmanDecoder (std::map<unsigned int, std::string> * lookup_tar
 	lookup_word_all2 = *lookup_word2;
 }
 
-target_text_huffman HuffmanDecoder::decode_line (std::vector<unsigned int> input){
+target_text HuffmanDecoder::decode_line (std::vector<unsigned int> input){
 	//demo decoder
-	target_text_huffman ret;
+	target_text ret;
 	//Split everything
 	std::vector<unsigned int> target_phrase;
 	std::vector<unsigned int> probs;
 	std::vector<unsigned int> wAll;
 
+	//Split the line into the proper arrays
 	short num_zeroes = 0;
 	int counter = 0;
 	while (num_zeroes < 3){
@@ -260,18 +297,28 @@ target_text_huffman HuffmanDecoder::decode_line (std::vector<unsigned int> input
 		counter++;
 	}
 
-	//Decode
-	for (std::vector<unsigned int>::iterator it = target_phrase.begin(); it != target_phrase.end(); it++){
-		std::cout << lookup_target_phrase.find(*it)->second << " ";
-	}
+	ret.target_phrase = target_phrase;
+	ret.word_all1 = splitWordAll1(StringPiece(lookup_word_all1.find(wAll[0])->second));
+	ret.word_all2 = splitWordAll2(StringPiece(lookup_word_all2.find(wAll[1])->second));
 
+	//Decode probabilities
 	for (std::vector<unsigned int>::iterator it = probs.begin(); it != probs.end(); it++){
-		std::cout << lookup_probabilities.find(*it)->second << " ";
+		ret.prob.push_back(atof(lookup_probabilities.find(*it)->second.c_str()));
 	}
-
-	std::cout << lookup_word_all1.find(wAll[0])->second << " ";
-	std::cout << lookup_word_all2.find(wAll[1])->second << " ";
 
 	return ret;
 
+}
+
+inline std::string HuffmanDecoder::getTargetWordFromID(unsigned int id) {
+	return lookup_target_phrase.find(id)->second;
+}
+
+std::string HuffmanDecoder::getTargetWordsFromIDs(std::vector<unsigned int> ids){
+	std::string returnstring;
+	for (std::vector<unsigned int>::iterator it = ids.begin(); it != ids.end(); it++){
+		returnstring.append(getTargetWordFromID(*it));
+	}
+
+	return returnstring;
 }

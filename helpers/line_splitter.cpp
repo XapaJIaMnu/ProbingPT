@@ -76,16 +76,16 @@ std::pair<std::vector<char>::iterator, int> vector_append(line_text* input, std:
 	return retvalues;
 }
 
-std::vector<double> splitProbabilities(StringPiece textin){
+std::vector<float> splitProbabilities(StringPiece textin){
 	const char delim[] = " ";
-	std::vector<double> output;
+	std::vector<float> output;
 
 	//Split on space
 	util::TokenIter<util::MultiCharacter> it(textin, util::MultiCharacter(delim));
 
 	//For each double
 	while (it) {
-		output.push_back(atof(it->data()));
+		output.push_back(std::stof(it->as_string()));
 		it++;
 	}
 
@@ -137,12 +137,13 @@ std::vector<int> splitWordAll2(StringPiece textin){
 target_text splitSingleTargetLine(StringPiece textin){
 	const char delim[] = "\t";
 	target_text output;
+	std::vector<unsigned int> stub;
 
 	//Split on elements:
 	util::TokenIter<util::MultiCharacter> it(textin, util::MultiCharacter(delim));
 
 	//Get target phrase
-	output.target_phrase = getVocabIDs(*it);
+	output.target_phrase = stub; //getVocabIDs(*it);
 	it++;
 
 	//Get probabilities

@@ -189,7 +189,9 @@ std::vector<unsigned int> Huffman::encode_line(line_text line){
 	//Get probabilities. Reinterpreting the float bytes as unsgined int.
 	util::TokenIter<util::SingleCharacter> probit(line.prob, util::SingleCharacter(' '));
 	while (probit) {
-		float num = std::stof(probit->as_string());
+		//Sometimes we have too big floats to handle, so first convert to double
+		double tempnum = atof(probit->data());
+		float num = (float)tempnum;
 		retvector.push_back(reinterpret_float(&num));
 		probit++;
 	}

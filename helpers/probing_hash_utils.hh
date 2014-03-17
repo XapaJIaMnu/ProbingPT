@@ -10,6 +10,7 @@
 struct Entry {
 	uint64_t key;
 	typedef uint64_t Key;
+	unsigned int bytes_toread;
 
 	uint64_t GetKey() const {
 		return key;

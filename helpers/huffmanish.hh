@@ -65,6 +65,10 @@ class Huffman {
 		const std::map<unsigned int, std::vector<unsigned char> > get_word_all2_lookup_map() const{
 			return lookup_word_all2;
 		}
+
+		unsigned long getUniqLines() {
+			return uniq_lines;
+		}
 };
 
 class HuffmanDecoder {

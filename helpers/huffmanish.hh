@@ -52,6 +52,9 @@ class Huffman {
 
 		std::vector<unsigned int> encode_line(line_text line);
 
+		//encode line + variable byte ontop
+		std::vector<unsigned char> full_encode_line(line_text line);
+
 		//Getters
 		const std::map<unsigned int, std::string> get_target_lookup_map() const{
 			return lookup_target_phrase;
@@ -90,6 +93,9 @@ public:
 	std::string getTargetWordsFromIDs(std::vector<unsigned int> ids);
 
 	target_text decode_line (std::vector<unsigned int> input);
+
+	//Variable byte decodes a all target phrases contained here and then passes them to decode_line
+	std::vector<target_text> full_decode_line (std::vector<unsigned char> lines);
 };
 
 std::string getTargetWordsFromIDs(std::vector<unsigned int> ids, std::map<unsigned int, std::string> * lookup_target_phrase);

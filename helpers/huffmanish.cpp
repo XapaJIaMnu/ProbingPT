@@ -170,6 +170,10 @@ void Huffman::serialize_maps(const char * dirname){
 	os3.close();
 }
 
+std::vector<unsigned char> Huffman::full_encode_line(line_text line){
+	return vbyte_encode_line((encode_line(line)));
+}
+
 std::vector<unsigned int> Huffman::encode_line(line_text line){
 	std::vector<unsigned int> retvector;
 
@@ -250,6 +254,39 @@ HuffmanDecoder::HuffmanDecoder (std::map<unsigned int, std::string> * lookup_tar
 	lookup_target_phrase = *lookup_target;
 	lookup_word_all1 = *lookup_word1;
 	lookup_word_all2 = *lookup_word2;
+}
+
+std::vector<target_text> HuffmanDecoder::full_decode_line (std::vector<unsigned char> lines){
+	std::vector<target_text> retvector; //All target phrases
+	std::vector<unsigned int> decoded_lines = vbyte_decode_line(lines); //All decoded lines
+	std::vector<unsigned int>::iterator it = decoded_lines.begin(); //Iterator for them
+	std::vector<unsigned int> current_target_phrase; //Current target phrase decoded
+
+	short zero_count = 0; //Count home many zeroes we have met. so far. Every 3 zeroes mean a new target phrase.
+	while(it != decoded_lines.end()){
+		if (zero_count == 3) {
+			//We have finished with this entry, decode it, and add it to the retvector.
+			retvector.push_back(decode_line(current_target_phrase));
+			current_target_phrase.clear(); //Clear the current target phrase and the zero_count
+			zero_count = 0; //So that we can reuse them for the next target phrase
+		}
+		//Add to the next target_phrase, number by number.
+		current_target_phrase.push_back(*it);
+		if (*it == 0) {
+			zero_count++;
+		}
+		it++; //Go to the next word/symbol
+	}
+	//Don't forget the last remaining line!
+	if (zero_count == 3) {
+		//We have finished with this entry, decode it, and add it to the retvector.
+		retvector.push_back(decode_line(current_target_phrase));
+		current_target_phrase.clear(); //Clear the current target phrase and the zero_count
+		zero_count = 0; //So that we can reuse them for the next target phrase
+	}
+
+	return retvector;
+
 }
 
 target_text HuffmanDecoder::decode_line (std::vector<unsigned int> input){

@@ -335,7 +335,7 @@ inline float reinterpret_uint(unsigned int * num){
 /*Mostly taken from stackoverflow, http://stackoverflow.com/questions/5858646/optimizing-variable-length-encoding
 and modified in order to return a vector of chars. Implements ULEB128 or variable byte encoding.
 This is highly optimized version with unrolled loop */
-std::vector<unsigned char> vbyte_encode(unsigned int num){
+inline std::vector<unsigned char> vbyte_encode(unsigned int num){
 	//Determine how many bytes we are going to take.
 	short size;
 	std::vector<unsigned char> byte_vector;
@@ -382,7 +382,7 @@ b1:
 	return byte_vector;
 }
 
-std::vector<unsigned int> vbyte_decode(std::vector<unsigned char> line){
+std::vector<unsigned int> vbyte_decode_line(std::vector<unsigned char> line){
 	std::vector<unsigned int> huffman_line;
 	std::vector<unsigned char> current_num;
 
@@ -397,7 +397,7 @@ std::vector<unsigned int> vbyte_decode(std::vector<unsigned char> line){
 	return huffman_line;
 }
 
-unsigned int bytes_to_int(std::vector<unsigned char> number){
+inline unsigned int bytes_to_int(std::vector<unsigned char> number){
 	unsigned int retvalue = 0;
 	std::vector<unsigned char>::iterator it = number.begin();
 	unsigned char shift = 0; //By how many bits to shift
@@ -411,3 +411,14 @@ unsigned int bytes_to_int(std::vector<unsigned char> number){
 	return retvalue;
 }
 
+std::vector<unsigned char> vbyte_encode_line(std::vector<unsigned int> line) {
+	std::vector<unsigned char> retvec;
+
+	//For each unsigned int in the line, vbyte encode it and add it to a vector of unsigned chars.
+	for (std::vector<unsigned int>::iterator it = line.begin(); it != line.end(); it++){
+		std::vector<unsigned char> vbyte_encoded = vbyte_encode(*it);
+		retvec.insert(retvec.end(), vbyte_encoded.begin(), vbyte_encoded.end());
+	}
+
+	return retvec;
+}

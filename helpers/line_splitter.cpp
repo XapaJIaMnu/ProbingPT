@@ -92,10 +92,10 @@ std::vector<float> splitProbabilities(StringPiece textin){
 	return output;
 }
 
-std::vector<int> splitWordAll1(StringPiece textin){
+std::vector<unsigned char> splitWordAll1(StringPiece textin){
 	const char delim[] = " ";
 	const char delim2[] = "-";
-	std::vector<int> output;
+	std::vector<unsigned char> output;
 
 	//Split on space
 	util::TokenIter<util::MultiCharacter> it(textin, util::MultiCharacter(delim));
@@ -106,10 +106,11 @@ std::vector<int> splitWordAll1(StringPiece textin){
 		util::TokenIter<util::MultiCharacter> itInner(*it, util::MultiCharacter(delim2));
 
 		//Insert the two entries in the vector. User will read entry 0 and 1 to get the first,
-		//2 and 3 for second etc.
-		output.push_back(atoi(itInner->data()));
+		//2 and 3 for second etc. Use unsigned char instead of int to save space, as 
+		//word allignments are all very small numbers that fit in a single byte
+		output.push_back((unsigned char)(atoi(itInner->data())));
 		itInner++;
-		output.push_back(atoi(itInner->data()));
+		output.push_back((unsigned char)(atoi(itInner->data())));
 		it++;
 	}
 
@@ -117,16 +118,17 @@ std::vector<int> splitWordAll1(StringPiece textin){
 
 }
 
-std::vector<int> splitWordAll2(StringPiece textin){
+std::vector<unsigned char> splitWordAll2(StringPiece textin){
 	const char delim[] = " ";
-	std::vector<int> output;
+	std::vector<unsigned char> output;
 
 	//Split on space
 	util::TokenIter<util::MultiCharacter> it(textin, util::MultiCharacter(delim));
 
-	//For each int
+	//For each int Use unsigned char instead of int to save space, as 
+	//word allignments are all very small numbers that fit in a single byte
 	while (it) {
-		output.push_back(atoi(it->data()));
+		output.push_back((unsigned char)(atoi(it->data())));
 		it++;
 	}
 

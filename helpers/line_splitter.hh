@@ -18,8 +18,8 @@ struct line_text {
 struct target_text {
 	std::vector<unsigned int> target_phrase;
 	std::vector<float> prob;
-	std::vector<int> word_all1;
-	std::vector<int> word_all2;
+	std::vector<unsigned char> word_all1;
+	std::vector<unsigned char> word_all2;
 };
 
 //Appends to the vector used for outputting.
@@ -38,6 +38,6 @@ target_text splitSingleTargetLine(StringPiece textin);
 
 std::vector<float> splitProbabilities(StringPiece textin);
 
-std::vector<int> splitWordAll1(StringPiece textin);
+std::vector<unsigned char> splitWordAll1(StringPiece textin);
 
-std::vector<int> splitWordAll2(StringPiece textin);
+std::vector<unsigned char> splitWordAll2(StringPiece textin);

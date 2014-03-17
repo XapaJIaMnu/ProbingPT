@@ -74,4 +74,13 @@ int main(int argc, char* argv[]){
 		std::cout << *it << " ";
 	}
 	std::cout << std::endl;
+
+	std::vector<int> pesho = {1,2,3};
+	std::vector<int> kiro = {1,2,3};
+	std::vector<int> giro = {2,1,3};
+	std::vector<int> gosho = {1,2,3,4};
+
+	bool z = pesho==kiro;
+
+	std::cout << (pesho==kiro) << ' ' << (kiro == giro) << ' ' << (kiro == gosho) << std::endl;
 }

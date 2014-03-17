@@ -18,8 +18,8 @@ int main(int argc, char* argv[]){
 	std::cout << std::endl;
 
 	std::map<unsigned int, std::string> lookup_target_phrase = huffmanclass.get_target_lookup_map();
-	std::map<unsigned int, std::string> lookup_word_all1 = huffmanclass.get_word_all1_lookup_map();
-	std::map<unsigned int, std::string> lookup_word_all2 = huffmanclass.get_word_all2_lookup_map();
+	std::map<unsigned int, std::vector<int> > lookup_word_all1 = huffmanclass.get_word_all1_lookup_map();
+	std::map<unsigned int, std::vector<int> > lookup_word_all2 = huffmanclass.get_word_all2_lookup_map();
 
 	HuffmanDecoder decoder(&lookup_target_phrase, &lookup_word_all1, &lookup_word_all2);
 

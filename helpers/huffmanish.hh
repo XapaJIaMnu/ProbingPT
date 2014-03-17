@@ -2,6 +2,7 @@
 #include "line_splitter.hh"
 #include "vocabid.hh"
 #include <boost/serialization/serialization.hpp>
+#include <boost/serialization/vector.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
@@ -13,28 +14,34 @@ struct sort_pair {
 	}
 };
 
+struct sort_pair_vec {
+	bool operator()(const std::pair<std::vector<int>, unsigned int> &left, const std::pair<std::vector<int>, unsigned int> &right) {
+		return left.second > right.second; //This puts biggest numbers first.
+	}
+};
+
 class Huffman {
 	unsigned long uniq_lines = 0; //Unique lines in the file.
 
 	//Containers used when counting the occurence of a given phrase
 	std::map<std::string, unsigned int> target_phrase_words;
-	std::map<std::string, unsigned int> word_all1;
-	std::map<std::string, unsigned int> word_all2;
+	std::map<std::vector<int>, unsigned int> word_all1;
+	std::map<std::vector<int>, unsigned int> word_all2;
 
 	//Same containers as vectors, for sorting
 	std::vector<std::pair<std::string, unsigned int> > target_phrase_words_counts;
-	std::vector<std::pair<std::string, unsigned int> > word_all1_counts;
-	std::vector<std::pair<std::string, unsigned int> > word_all2_counts;
+	std::vector<std::pair<std::vector<int>, unsigned int> > word_all1_counts;
+	std::vector<std::pair<std::vector<int>, unsigned int> > word_all2_counts;
 
 	//Huffman maps
 	std::map<std::string, unsigned int> target_phrase_huffman;
-	std::map<std::string, unsigned int> word_all1_huffman;
-	std::map<std::string, unsigned int> word_all2_huffman;
+	std::map<std::vector<int>, unsigned int> word_all1_huffman;
+	std::map<std::vector<int>, unsigned int> word_all2_huffman;
 
 	//inverted maps
 	std::map<unsigned int, std::string> lookup_target_phrase;
-	std::map<unsigned int, std::string> lookup_word_all1;
-	std::map<unsigned int, std::string> lookup_word_all2;
+	std::map<unsigned int, std::vector<int> > lookup_word_all1;
+	std::map<unsigned int, std::vector<int> > lookup_word_all2;
 
 	public:
 		Huffman (const char *);
@@ -49,32 +56,32 @@ class Huffman {
 		const std::map<unsigned int, std::string> get_target_lookup_map() const{
 			return lookup_target_phrase;
 		}
-		const std::map<unsigned int, std::string> get_word_all1_lookup_map() const{
+		const std::map<unsigned int, std::vector<int> > get_word_all1_lookup_map() const{
 			return lookup_word_all1;
 		}
-		const std::map<unsigned int, std::string> get_word_all2_lookup_map() const{
+		const std::map<unsigned int, std::vector<int> > get_word_all2_lookup_map() const{
 			return lookup_word_all2;
 		}
 };
 
 class HuffmanDecoder {
 	std::map<unsigned int, std::string> lookup_target_phrase;
-	std::map<unsigned int, std::string> lookup_word_all1;
-	std::map<unsigned int, std::string> lookup_word_all2;
+	std::map<unsigned int, std::vector<int> > lookup_word_all1;
+	std::map<unsigned int, std::vector<int> > lookup_word_all2;
 
 public:
 	HuffmanDecoder (const char *);
 	HuffmanDecoder (std::map<unsigned int, std::string> *,
-	 std::map<unsigned int, std::string> *, std::map<unsigned int, std::string> *);
+	 std::map<unsigned int, std::vector<int>> *, std::map<unsigned int, std::vector<int>> *);
 
 	//Getters
 	const std::map<unsigned int, std::string> get_target_lookup_map() const{
 		return lookup_target_phrase;
 	}
-	const std::map<unsigned int, std::string> get_word_all1_lookup_map() const{
+	const std::map<unsigned int, std::vector<int> > get_word_all1_lookup_map() const{
 		return lookup_word_all1;
 	}
-	const std::map<unsigned int, std::string> get_word_all2_lookup_map() const{
+	const std::map<unsigned int, std::vector<int> > get_word_all2_lookup_map() const{
 		return lookup_word_all2;
 	}
 

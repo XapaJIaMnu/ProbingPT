@@ -3,8 +3,8 @@
 BinaryFileWriter::BinaryFileWriter (std::string basepath) : os ((basepath + "/binfile.dat").c_str(), std::ios::binary) {
 	binfile.reserve(10000); //Reserve part of the vector to avoid realocation
 	it = binfile.begin();
-	unsigned int dist_from_start = 0; //Initialize variables
-	uint64_t extra_counter = 0;
+	dist_from_start = 0; //Initialize variables
+	extra_counter = 0;
 }
 
 void BinaryFileWriter::write (std::vector<unsigned char> * bytes) {

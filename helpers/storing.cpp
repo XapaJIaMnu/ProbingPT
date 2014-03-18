@@ -3,6 +3,8 @@
 BinaryFileWriter::BinaryFileWriter (std::string basepath) : os ((basepath + "/binfile.dat").c_str(), std::ios::binary) {
 	binfile.reserve(10000); //Reserve part of the vector to avoid realocation
 	it = binfile.begin();
+	unsigned int dist_from_start = 0; //Initialize variables
+	uint64_t extra_counter = 0;
 }
 
 void BinaryFileWriter::write (std::vector<unsigned char> * bytes) {
@@ -111,7 +113,7 @@ void createProbingPT(const char * phrasetable_path, const char * target_path){
 		} catch (util::EndOfFileException e){
 			std::cerr << "Reading phrase table finished, writing remaining files to disk." << std::endl;
 			binfile.flush();
-			
+
 			//After the final entry is constructed we need to add it to the phrase_table
 			//Create an entry for the previous source phrase:
 			Entry pesho;

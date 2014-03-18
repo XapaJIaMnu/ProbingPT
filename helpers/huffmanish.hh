@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/map.hpp>
@@ -24,7 +25,7 @@ struct sort_pair_vec {
 };
 
 class Huffman {
-	unsigned long uniq_lines = 0; //Unique lines in the file.
+	unsigned long uniq_lines; //Unique lines in the file.
 
 	//Containers used when counting the occurence of a given phrase
 	std::map<std::string, unsigned int> target_phrase_words;

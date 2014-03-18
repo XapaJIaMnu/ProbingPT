@@ -19,8 +19,8 @@ class BinaryFileWriter {
 	std::ofstream os;
 
 public:
-	unsigned int dist_from_start = 0; //Distance from the start of the vector.
-	uint64_t extra_counter = 0; //After we reset the counter, we still want to keep track of the correct offset, so
+	unsigned int dist_from_start; //Distance from the start of the vector.
+	uint64_t extra_counter; //After we reset the counter, we still want to keep track of the correct offset, so
 
 	BinaryFileWriter (std::string);
 	~BinaryFileWriter ();

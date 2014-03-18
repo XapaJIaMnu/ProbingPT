@@ -4,6 +4,9 @@ Huffman::Huffman (const char * filepath) {
 	//Read the file
 	util::FilePiece filein(filepath);
 
+	//Init uniq_lines to zero;
+	uniq_lines = 0;
+
 	line_text prev_line; //Check for unique lines.
 	int num_lines = 0 ;
 
@@ -119,13 +122,13 @@ void Huffman::serialize_maps(const char * dirname){
 	std::string word_all1_path(basedir + "/Wall1");
 
 	//Target phrase
-	std::ofstream os (target_phrase_path, std::ios::binary);
+	std::ofstream os (target_phrase_path.c_str(), std::ios::binary);
 	boost::archive::text_oarchive oarch(os);
 	oarch << lookup_target_phrase;
 	os.close();
 
 	//Word all1
-	std::ofstream os2 (word_all1_path, std::ios::binary);
+	std::ofstream os2 (word_all1_path.c_str(), std::ios::binary);
 	boost::archive::text_oarchive oarch2(os2);
 	oarch2 << lookup_word_all1;
 	os2.close();
@@ -188,13 +191,13 @@ HuffmanDecoder::HuffmanDecoder (const char * dirname){
 	std::string word_all1_path(basedir + "/Wall1");
 
 	//Target phrases
-	std::ifstream is (target_phrase_path, std::ios::binary);
+	std::ifstream is (target_phrase_path.c_str(), std::ios::binary);
 	boost::archive::text_iarchive iarch(is);
 	iarch >> lookup_target_phrase;
 	is.close();
 
 	//Word allignment 1
-	std::ifstream is2 (word_all1_path, std::ios::binary);
+	std::ifstream is2 (word_all1_path.c_str(), std::ios::binary);
 	boost::archive::text_iarchive iarch2(is2);
 	iarch2 >> lookup_word_all1;
 	is2.close();

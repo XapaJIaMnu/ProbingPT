@@ -5,6 +5,7 @@
 #include <stdlib.h> //atof
 #include "util/string_piece.hh"  //Tokenization and work with StringPiece
 #include "util/tokenize_piece.hh"
+#include <vector>
 
 //Struct for holding processed line
 struct line_text {
@@ -25,8 +26,4 @@ struct target_text {
 //Ask if it's better to have it receive a pointer to a line_text struct
 line_text splitLine(StringPiece textin);
 
-std::vector<float> splitProbabilities(StringPiece textin);
-
 std::vector<unsigned char> splitWordAll1(StringPiece textin);
-
-std::vector<unsigned char> splitWordAll2(StringPiece textin);

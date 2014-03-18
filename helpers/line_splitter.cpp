@@ -24,22 +24,6 @@ line_text splitLine(StringPiece textin) {
 	return output;
 }
 
-std::vector<float> splitProbabilities(StringPiece textin){
-	const char delim[] = " ";
-	std::vector<float> output;
-
-	//Split on space
-	util::TokenIter<util::MultiCharacter> it(textin, util::MultiCharacter(delim));
-
-	//For each double
-	while (it) {
-		output.push_back(std::stof(it->as_string()));
-		it++;
-	}
-
-	return output;
-}
-
 std::vector<unsigned char> splitWordAll1(StringPiece textin){
 	const char delim[] = " ";
 	const char delim2[] = "-";
@@ -59,24 +43,6 @@ std::vector<unsigned char> splitWordAll1(StringPiece textin){
 		output.push_back((unsigned char)(atoi(itInner->data())));
 		itInner++;
 		output.push_back((unsigned char)(atoi(itInner->data())));
-		it++;
-	}
-
-	return output;
-
-}
-
-std::vector<unsigned char> splitWordAll2(StringPiece textin){
-	const char delim[] = " ";
-	std::vector<unsigned char> output;
-
-	//Split on space
-	util::TokenIter<util::MultiCharacter> it(textin, util::MultiCharacter(delim));
-
-	//For each int Use unsigned char instead of int to save space, as 
-	//word allignments are all very small numbers that fit in a single byte
-	while (it) {
-		output.push_back((unsigned char)(atoi(it->data())));
 		it++;
 	}
 

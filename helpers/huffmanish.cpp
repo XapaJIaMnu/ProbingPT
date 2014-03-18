@@ -64,25 +64,11 @@ void Huffman::count_elements(line_text linein){
 		word_all1.insert(std::pair<std::vector<unsigned char>, unsigned int>(numbers, 1));
 	}
 
-	//For word allignment 2
-	std::map<std::vector<unsigned char>, unsigned int>::iterator mapiter4;
-	std::vector<unsigned char> numbers2 = splitWordAll2(linein.word_all2);
-	mapiter4 = word_all2.find(numbers);
-
-	if (mapiter4 != word_all2.end()){
-		//If the element is found, increment the count.
-		mapiter4->second++;
-	} else {
-		//Else create a new entry;
-		word_all2.insert(std::pair<std::vector<unsigned char>, unsigned int>(numbers2, 1));
-	}
-
 }
 
 //Assigns huffman values for each unique element
 void Huffman::assign_values() {
 	//First create vectors for all maps so that we could sort them later.
-
 
 	//Create a vector for target phrases
 	for(std::map<std::string, unsigned int>::iterator it = target_phrase_words.begin(); it != target_phrase_words.end(); it++ ) {
@@ -98,13 +84,6 @@ void Huffman::assign_values() {
 	//Sort it
 	std::sort(word_all1_counts.begin(), word_all1_counts.end(), sort_pair_vec());
 
-	//Create a vector for word allignments 2
-	for(std::map<std::vector<unsigned char>, unsigned int>::iterator it = word_all2.begin(); it != word_all2.end(); it++ ) {
-		word_all2_counts.push_back(*it);
-	}
-	//Sort it
-	std::sort(word_all2_counts.begin(), word_all2_counts.end(), sort_pair_vec());
-
 
 	//Afterwards we assign a value for each phrase, starting from 1, as zero is reserved for delimiter
 	unsigned int i = 1; //huffman code
@@ -113,8 +92,6 @@ void Huffman::assign_values() {
 		target_phrase_huffman.insert(std::pair<std::string, unsigned int>(it->first, i));
 		i++; //Go to the next huffman code
 	}
-	std::cerr << "Maximum huffman code for target prases is: " << i << std::endl;
-	std::cerr << "Word 25 is: " << target_phrase_words_counts[25].first << " count is " << target_phrase_words_counts[25].second << std::endl;
 
 	i = 1; //Reset i for the next map
 	for(std::vector<std::pair<std::vector<unsigned char>, unsigned int> >::iterator it = word_all1_counts.begin();
@@ -122,24 +99,15 @@ void Huffman::assign_values() {
 		word_all1_huffman.insert(std::pair<std::vector<unsigned char>, unsigned int>(it->first, i));
 		i++; //Go to the next huffman code
 	}
-	std::cerr << "Maximum huffman code for word all1 is: " << i << std::endl;
-
-	i = 1; //Reset i for the next map
-	for(std::vector<std::pair<std::vector<unsigned char>, unsigned int> >::iterator it = word_all2_counts.begin();
-	 it != word_all2_counts.end(); it++){
-		word_all2_huffman.insert(std::pair<std::vector<unsigned char>, unsigned int>(it->first, i));
-		i++; //Go to the next huffman code
-	}
-	std::cerr << "Maximum huffman code for word all2 is: " << i << std::endl;
 
 	//After lookups are produced, clear some memory usage of objects not needed anymore.
 	target_phrase_words.clear();
 	word_all1.clear();
-	word_all2.clear();
 
 	target_phrase_words_counts.clear();
 	word_all1_counts.clear();
-	word_all2_counts.clear();
+
+	std::cerr << "Finished generating huffman codes." << std::endl;
 
 }
 
@@ -149,7 +117,6 @@ void Huffman::serialize_maps(const char * dirname){
 	std::string target_phrase_path(basedir + "/target_phrases");
 	std::string probabilities_path(basedir + "/probs");
 	std::string word_all1_path(basedir + "/Wall1");
-	std::string word_all2_path(basedir + "/Wall2");
 
 	//Target phrase
 	std::ofstream os (target_phrase_path, std::ios::binary);
@@ -162,12 +129,6 @@ void Huffman::serialize_maps(const char * dirname){
 	boost::archive::text_oarchive oarch2(os2);
 	oarch2 << lookup_word_all1;
 	os2.close();
-
-	//Word all2
-	std::ofstream os3 (word_all2_path, std::ios::binary);
-	boost::archive::text_oarchive oarch3(os3);
-	oarch3 << lookup_word_all2;
-	os3.close();
 }
 
 std::vector<unsigned char> Huffman::full_encode_line(line_text line){
@@ -201,9 +162,6 @@ std::vector<unsigned int> Huffman::encode_line(line_text line){
 
 	//Get Word allignments
 	retvector.push_back(word_all1_huffman.find(splitWordAll1(line.word_all1))->second);
-	//No need of zero here, because we are expecting a single number only
-
-	retvector.push_back(word_all2_huffman.find(splitWordAll2(line.word_all2))->second);
 	retvector.push_back(0);
 
 	return retvector;
@@ -219,9 +177,6 @@ void Huffman::produce_lookups(){
 		lookup_word_all1.insert(std::pair<unsigned int, std::vector<unsigned char> >(it->second, it->first));
 	}
 
-	for(std::map<std::vector<unsigned char>, unsigned int>::iterator it = word_all2_huffman.begin(); it != word_all2_huffman.end(); it++ ) {
-		lookup_word_all2.insert(std::pair<unsigned int, std::vector<unsigned char> >(it->second, it->first));
-	}
 }
 
 HuffmanDecoder::HuffmanDecoder (const char * dirname){
@@ -231,7 +186,6 @@ HuffmanDecoder::HuffmanDecoder (const char * dirname){
 	std::string basedir(dirname);
 	std::string target_phrase_path(basedir + "/target_phrases");
 	std::string word_all1_path(basedir + "/Wall1");
-	std::string word_all2_path(basedir + "/Wall2");
 
 	//Target phrases
 	std::ifstream is (target_phrase_path, std::ios::binary);
@@ -239,23 +193,18 @@ HuffmanDecoder::HuffmanDecoder (const char * dirname){
 	iarch >> lookup_target_phrase;
 	is.close();
 
-	//Word allignment 1 & 2
+	//Word allignment 1
 	std::ifstream is2 (word_all1_path, std::ios::binary);
 	boost::archive::text_iarchive iarch2(is2);
 	iarch2 >> lookup_word_all1;
 	is2.close();
 
-	std::ifstream is3 (word_all2_path, std::ios::binary);
-	boost::archive::text_iarchive iarch3(is3);
-	iarch3 >> lookup_word_all2;
-	is3.close();
 }
 
 HuffmanDecoder::HuffmanDecoder (std::map<unsigned int, std::string> * lookup_target,
-	 std::map<unsigned int, std::vector<unsigned char> > * lookup_word1, std::map<unsigned int, std::vector<unsigned char> > * lookup_word2) {
+	 std::map<unsigned int, std::vector<unsigned char> > * lookup_word1) {
 	lookup_target_phrase = *lookup_target;
 	lookup_word_all1 = *lookup_word1;
-	lookup_word_all2 = *lookup_word2;
 }
 
 std::vector<target_text> HuffmanDecoder::full_decode_line (std::vector<unsigned char> lines){
@@ -297,7 +246,7 @@ target_text HuffmanDecoder::decode_line (std::vector<unsigned int> input){
 	//Split everything
 	std::vector<unsigned int> target_phrase;
 	std::vector<unsigned int> probs;
-	std::vector<unsigned int> wAll;
+	unsigned int wAll;
 
 	//Split the line into the proper arrays
 	short num_zeroes = 0;
@@ -311,14 +260,13 @@ target_text HuffmanDecoder::decode_line (std::vector<unsigned int> input){
 		} else if (num_zeroes == 1){
 			probs.push_back(num);
 		} else if (num_zeroes == 2){
-			wAll.push_back(num);
+			wAll = num;
 		}
 		counter++;
 	}
 
 	ret.target_phrase = target_phrase;
-	ret.word_all1 = lookup_word_all1.find(wAll[0])->second;
-	ret.word_all2 = lookup_word_all2.find(wAll[1])->second;
+	ret.word_all1 = lookup_word_all1.find(wAll)->second;
 
 	//Decode probabilities
 	for (std::vector<unsigned int>::iterator it = probs.begin(); it != probs.end(); it++){

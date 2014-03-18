@@ -29,22 +29,18 @@ class Huffman {
 	//Containers used when counting the occurence of a given phrase
 	std::map<std::string, unsigned int> target_phrase_words;
 	std::map<std::vector<unsigned char>, unsigned int> word_all1;
-	std::map<std::vector<unsigned char>, unsigned int> word_all2;
 
 	//Same containers as vectors, for sorting
 	std::vector<std::pair<std::string, unsigned int> > target_phrase_words_counts;
 	std::vector<std::pair<std::vector<unsigned char>, unsigned int> > word_all1_counts;
-	std::vector<std::pair<std::vector<unsigned char>, unsigned int> > word_all2_counts;
 
 	//Huffman maps
 	std::map<std::string, unsigned int> target_phrase_huffman;
 	std::map<std::vector<unsigned char>, unsigned int> word_all1_huffman;
-	std::map<std::vector<unsigned char>, unsigned int> word_all2_huffman;
 
 	//inverted maps
 	std::map<unsigned int, std::string> lookup_target_phrase;
 	std::map<unsigned int, std::vector<unsigned char> > lookup_word_all1;
-	std::map<unsigned int, std::vector<unsigned char> > lookup_word_all2;
 
 	public:
 		Huffman (const char *);
@@ -65,9 +61,6 @@ class Huffman {
 		const std::map<unsigned int, std::vector<unsigned char> > get_word_all1_lookup_map() const{
 			return lookup_word_all1;
 		}
-		const std::map<unsigned int, std::vector<unsigned char> > get_word_all2_lookup_map() const{
-			return lookup_word_all2;
-		}
 
 		unsigned long getUniqLines() {
 			return uniq_lines;
@@ -77,12 +70,10 @@ class Huffman {
 class HuffmanDecoder {
 	std::map<unsigned int, std::string> lookup_target_phrase;
 	std::map<unsigned int, std::vector<unsigned char> > lookup_word_all1;
-	std::map<unsigned int, std::vector<unsigned char> > lookup_word_all2;
 
 public:
 	HuffmanDecoder (const char *);
-	HuffmanDecoder (std::map<unsigned int, std::string> *,
-	 std::map<unsigned int, std::vector<unsigned char> > *, std::map<unsigned int, std::vector<unsigned char> > *);
+	HuffmanDecoder (std::map<unsigned int, std::string> *, std::map<unsigned int, std::vector<unsigned char> > *);
 
 	//Getters
 	const std::map<unsigned int, std::string> get_target_lookup_map() const{
@@ -90,9 +81,6 @@ public:
 	}
 	const std::map<unsigned int, std::vector<unsigned char> > get_word_all1_lookup_map() const{
 		return lookup_word_all1;
-	}
-	const std::map<unsigned int, std::vector<unsigned char> > get_word_all2_lookup_map() const{
-		return lookup_word_all2;
 	}
 
 	inline std::string getTargetWordFromID(unsigned int id);

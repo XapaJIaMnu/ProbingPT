@@ -167,12 +167,6 @@ void QueryEngine::printTargetInfo(std::vector<target_text> target_phrases){
 				std::cout << (short)target_phrases[i].word_all1[j] << " ";
 			}
 		}
-		std::cout << "\t";
-
-		//print word_all2
-		for (int j = 0; j<target_phrases[i].word_all2.size(); j++){
-			std::cout << (short)target_phrases[i].word_all2[j] << " ";
-		}
 		std::cout << std::endl;
 	}
 }

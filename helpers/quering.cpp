@@ -80,11 +80,16 @@ std::pair<bool, std::vector<target_text> > QueryEngine::query(std::vector<uint64
 		//We will read the largest entry in bytes and then filter the unnecesarry with functions
 		//from line_splitter
 		uint64_t initial_index = entry -> GetValue();
-		unsigned int end_index = entry -> bytes_toread;
+		unsigned int bytes_toread = entry -> bytes_toread;
 		//At the end of the file we can't readd + largest_entry cause we get a segfault.
+		std::cerr << "Entry size is bytes is: " << bytes_toread << std::endl;
 		
+		//ASK HIEU FOR MORE EFFICIENT WAY TO DO THIS!
 		std::vector<unsigned char> encoded_text; //Assign to the vector the relevant portion of the array.
-		encoded_text.assign(binary_mmaped[initial_index] , initial_index - end_index);
+		encoded_text.reserve(bytes_toread);
+		for (int i = 0; i < bytes_toread; i++){
+			encoded_text.push_back(binary_mmaped[i+initial_index]);
+		}
 
 		//Get only the translation entries necessary
 		translation_entries = decoder.full_decode_line(encoded_text);
@@ -118,11 +123,16 @@ std::pair<bool, std::vector<target_text> > QueryEngine::query(StringPiece source
 		//We will read the largest entry in bytes and then filter the unnecesarry with functions
 		//from line_splitter
 		uint64_t initial_index = entry -> GetValue();
-		unsigned int end_index = entry -> bytes_toread;
+		unsigned int bytes_toread = entry -> bytes_toread;
 		//At the end of the file we can't readd + largest_entry cause we get a segfault.
+		std::cerr << "Entry size is bytes is: " << bytes_toread << std::endl;
 		
+		//ASK HIEU FOR MORE EFFICIENT WAY TO DO THIS!
 		std::vector<unsigned char> encoded_text; //Assign to the vector the relevant portion of the array.
-		encoded_text.assign(binary_mmaped[initial_index] , initial_index - end_index);
+		encoded_text.reserve(bytes_toread);
+		for (int i = 0; i < bytes_toread; i++){
+			encoded_text.push_back(binary_mmaped[i+initial_index]);
+		}
 
 		//Get only the translation entries necessary
 		translation_entries = decoder.full_decode_line(encoded_text);
@@ -152,16 +162,16 @@ void QueryEngine::printTargetInfo(std::vector<target_text> target_phrases){
 		//Print word_all1
 		for (int j = 0; j<target_phrases[i].word_all1.size(); j++){
 			if (j%2 == 0){
-				std::cout << target_phrases[i].word_all1[j] << "-";
+				std::cout << (short)target_phrases[i].word_all1[j] << "-";
 			}else{
-				std::cout << target_phrases[i].word_all1[j] << " ";
+				std::cout << (short)target_phrases[i].word_all1[j] << " ";
 			}
 		}
 		std::cout << "\t";
 
 		//print word_all2
 		for (int j = 0; j<target_phrases[i].word_all2.size(); j++){
-			std::cout << target_phrases[i].word_all1[j] << " ";
+			std::cout << (short)target_phrases[i].word_all2[j] << " ";
 		}
 		std::cout << std::endl;
 	}

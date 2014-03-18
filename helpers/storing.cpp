@@ -60,8 +60,7 @@ void createProbingPT(const char * phrasetable_path, const char * target_path){
 	line_text prev_line; //Check if the source phrase of the previous line is the same
 
 	//Keep track of the size of each group of target phrases
-	uint64_t entrystartidx;
-	unsigned long entryendidx;
+	uint64_t entrystartidx = 0;
 	//uint64_t line_num = 0;
 
 
@@ -72,28 +71,29 @@ void createProbingPT(const char * phrasetable_path, const char * target_path){
 			line_text line;
 			line = splitLine(filein.ReadLine());
 
+			if ((binfile.dist_from_start + binfile.extra_counter) == 0) {
+				prev_line = line; //For the first iteration assume the previous line is
+			} //The same as this one.
+
 			if (line.source_phrase != prev_line.source_phrase){
 
-				if ((binfile.dist_from_start + binfile.extra_counter) != 0) {
-					//If this is the first line of the phrase table we shouldn't
-					//Create a new entry even
+				//Create a new entry even
 
-					//Create an entry for the previous source phrase:
-					Entry pesho;
-					pesho.value = entrystartidx;
-					//The key is the sum of hashes of individual words. Probably not entirerly correct, but fast
-					pesho.key = 0;
-					std::vector<uint64_t> vocabid_source = getVocabIDs(line.source_phrase);
-					for (int i = 0; i < vocabid_source.size(); i++){
-						pesho.key += vocabid_source[i];
-					}
-					pesho.bytes_toread = binfile.dist_from_start + binfile.extra_counter - entrystartidx;
-
-					//Put into table
-					table.Insert(pesho);
-
+				//Create an entry for the previous source phrase:
+				Entry pesho;
+				pesho.value = entrystartidx;
+				//The key is the sum of hashes of individual words. Probably not entirerly correct, but fast
+				pesho.key = 0;
+				std::vector<uint64_t> vocabid_source = getVocabIDs(prev_line.source_phrase);
+				for (int i = 0; i < vocabid_source.size(); i++){
+					pesho.key += vocabid_source[i];
 				}
-				entrystartidx = binfile.dist_from_start + binfile.extra_counter + 1; //Designate start idx for new entry
+				pesho.bytes_toread = binfile.dist_from_start + binfile.extra_counter - entrystartidx;
+
+				//Put into table
+				table.Insert(pesho);
+
+				entrystartidx = binfile.dist_from_start + binfile.extra_counter; //Designate start idx for new entry
 
 				//Encode a line and write it to disk.
 				std::vector<unsigned char> encoded_line = huffmanEncoder.full_encode_line(line);
@@ -111,6 +111,21 @@ void createProbingPT(const char * phrasetable_path, const char * target_path){
 		} catch (util::EndOfFileException e){
 			std::cerr << "Reading phrase table finished, writing remaining files to disk." << std::endl;
 			binfile.flush();
+			
+			//After the final entry is constructed we need to add it to the phrase_table
+			//Create an entry for the previous source phrase:
+			Entry pesho;
+			pesho.value = entrystartidx;
+			//The key is the sum of hashes of individual words. Probably not entirerly correct, but fast
+			pesho.key = 0;
+			std::vector<uint64_t> vocabid_source = getVocabIDs(prev_line.source_phrase);
+			for (int i = 0; i < vocabid_source.size(); i++){
+				pesho.key += vocabid_source[i];
+			}
+			pesho.bytes_toread = binfile.dist_from_start + binfile.extra_counter - entrystartidx;
+			//Put into table
+			table.Insert(pesho);
+
 			break;
 		}
 	}

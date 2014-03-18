@@ -136,4 +136,14 @@ int main(int argc, char* argv[]){
 	}
 
 	std::cout << (int)tmp.word_all1[0] << " " << (int)tmp.word_all2[0] << std::endl;
+
+	std::vector<unsigned int> test = {1};
+	std::cout << "Size is! " << (vbyte_encode_line(test)).size() << std::endl;
+
+	std::vector<unsigned int> test2 = {1,2};
+	std::cout << "Size is! " << (vbyte_encode_line(test2)).size() << std::endl;
+
+	std::vector<unsigned int> test3 = {250430};
+	std::cout << "Size is! " << (vbyte_encode_line(test3)).size() << std::endl;
+
 }

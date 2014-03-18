@@ -2,9 +2,8 @@
 #include <fstream>
 #include <iostream>  
 
-#include "helpers/hash.hh"
+#include "helpers/hash.hh" //Includes line_splitter
 #include "helpers/probing_hash_utils.hh"
-#include "helpers/vocabid.hh"
 #include "helpers/huffmanish.hh"
 #include <sys/stat.h> //mkdir
 

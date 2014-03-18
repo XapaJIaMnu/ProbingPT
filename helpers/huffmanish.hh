@@ -1,6 +1,9 @@
 //Huffman encodes a line and also produces the vocabulary ids
+#include "hash.hh"
 #include "line_splitter.hh"
-#include "vocabid.hh"
+#include <stdio.h>
+#include <fstream>
+#include <iostream>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/map.hpp>

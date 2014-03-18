@@ -58,8 +58,6 @@ void createProbingPT(const char * phrasetable_path, const char * target_path){
 	BinaryFileWriter binfile(basepath); //Init the binary file writer.
 
 	line_text prev_line; //Check if the source phrase of the previous line is the same
-	int longestchars = 0; //Keep track of what is the maximum number of characters we need to read when quering
-	int currentlong = 0; //How long is the current
 
 	//Keep track of the size of each group of target phrases
 	uint64_t entrystartidx;
@@ -69,12 +67,10 @@ void createProbingPT(const char * phrasetable_path, const char * target_path){
 
 	//Read everything and processs
 	while(true){
-		//line_num++;
 		try {
 			//Process line read
 			line_text line;
 			line = splitLine(filein.ReadLine());
-			//std::cout << "Reached line number: " << line_num << std::endl;
 
 			if (line.source_phrase != prev_line.source_phrase){
 
@@ -93,10 +89,6 @@ void createProbingPT(const char * phrasetable_path, const char * target_path){
 					}
 					pesho.bytes_toread = binfile.dist_from_start + binfile.extra_counter - entrystartidx;
 
-					//FInd out how long the longest entry is:
-					if (pesho.bytes_toread > longestchars) {
-						longestchars = pesho.bytes_toread;
-					}
 					//Put into table
 					table.Insert(pesho);
 
@@ -130,7 +122,6 @@ void createProbingPT(const char * phrasetable_path, const char * target_path){
 	//Write configfile
 	std::ofstream configfile;
 	configfile.open((basepath + "/config").c_str());
-	configfile << uniq_entries << '\n' << longestchars;
-	std::cerr << "Longest char sequence detected is: " << longestchars << std::endl;
+	configfile << uniq_entries << '\n';
 	configfile.close();
 }

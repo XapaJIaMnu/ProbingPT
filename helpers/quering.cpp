@@ -1,9 +1,9 @@
 #include "quering.hh"
-/*
-char * read_binary_file(const char * filename, size_t filesize){
+
+unsigned char * read_binary_file(const char * filename, size_t filesize){
 	//Get filesize
 	int fd;
-	char * map;
+	unsigned char * map;
 
 	fd = open(filename, O_RDONLY);
 
@@ -12,7 +12,7 @@ char * read_binary_file(const char * filename, size_t filesize){
 		exit(EXIT_FAILURE);
 	}
 
-	map = (char *)mmap(0, filesize, PROT_READ, MAP_SHARED, fd, 0);
+	map = (unsigned char *)mmap(0, filesize, PROT_READ, MAP_SHARED, fd, 0);
 	if (map == MAP_FAILED) {
 		close(fd);
 		perror("Error mmapping the file");
@@ -20,24 +20,23 @@ char * read_binary_file(const char * filename, size_t filesize){
 	}
 
 	return map;
-} 
+}
 
-QueryEngine::QueryEngine(const char * filepath){
+QueryEngine::QueryEngine(const char * filepath) : decoder(filepath){
 	
 	//Create filepaths
 	std::string basepath(filepath);
 	std::string path_to_hashtable = basepath + "/probing_hash.dat";
 	std::string path_to_data_bin = basepath + "/binfile.dat";
-	std::string path_to_vocabid = basepath + "/vocabid.dat";
+
+	//Target phrase vocabIDs
+	vocabids = decoder.get_target_lookup_map();
 
 	//Read config file
 	std::string line;
 	std::ifstream config ((basepath + "/config").c_str());
 	getline(config, line);
 	int tablesize = atoi(line.c_str()); //Get tablesize.
-
-	getline(config, line);
-	largest_entry = atoi(line.c_str()); //Set largest_entry.
 	config.close();
 
 	//Mmap binary table
@@ -52,10 +51,7 @@ QueryEngine::QueryEngine(const char * filepath){
 	Table table_init(mem, table_filesize);
 	table = table_init;
 
-	//Read vocabid
-	read_map(&vocabids, path_to_vocabid.c_str());
-
-	std::cout << "Initialized successfully! " << std::endl;
+	std::cerr << "Initialized successfully! " << std::endl;
 }
 
 QueryEngine::~QueryEngine(){
@@ -84,17 +80,14 @@ std::pair<bool, std::vector<target_text> > QueryEngine::query(std::vector<uint64
 		//We will read the largest entry in bytes and then filter the unnecesarry with functions
 		//from line_splitter
 		uint64_t initial_index = entry -> GetValue();
-		uint64_t end_index = initial_index + largest_entry;
+		unsigned int end_index = entry -> bytes_toread;
 		//At the end of the file we can't readd + largest_entry cause we get a segfault.
-		//Instead read till the end of the file.
-		if (end_index > binary_filesize){
-			end_index = binary_filesize;
-		}
-		std::string text_entry(&binary_mmaped[initial_index] , &binary_mmaped[end_index]);
-		StringPiece raw_string = StringPiece(text_entry);
+		
+		std::vector<unsigned char> encoded_text; //Assign to the vector the relevant portion of the array.
+		encoded_text.assign(binary_mmaped[initial_index] , initial_index - end_index);
 
 		//Get only the translation entries necessary
-		translation_entries = splitTargetLine(raw_string);
+		translation_entries = decoder.full_decode_line(encoded_text);
 
 	}
 
@@ -124,19 +117,15 @@ std::pair<bool, std::vector<target_text> > QueryEngine::query(StringPiece source
 		//The phrase that was searched for was found! We need to get the translation entries.
 		//We will read the largest entry in bytes and then filter the unnecesarry with functions
 		//from line_splitter
-
 		uint64_t initial_index = entry -> GetValue();
-		uint64_t end_index = initial_index + largest_entry;
+		unsigned int end_index = entry -> bytes_toread;
 		//At the end of the file we can't readd + largest_entry cause we get a segfault.
-		//Instead read till the end of the file.
-		if (end_index > binary_filesize){
-			end_index = binary_filesize;
-		}
-		std::string text_entry(&binary_mmaped[initial_index] , &binary_mmaped[end_index]);
-		StringPiece raw_string = StringPiece(text_entry);
+		
+		std::vector<unsigned char> encoded_text; //Assign to the vector the relevant portion of the array.
+		encoded_text.assign(binary_mmaped[initial_index] , initial_index - end_index);
 
 		//Get only the translation entries necessary
-		translation_entries = splitTargetLine(raw_string);
+		translation_entries = decoder.full_decode_line(encoded_text);
 
 	}
 
@@ -152,7 +141,7 @@ void QueryEngine::printTargetInfo(std::vector<target_text> target_phrases){
 	for (int i = 0; i<entries; i++){
 		std::cout << "Entry " << i+1 << " of " << entries << ":" << std::endl;
 		//Print text
-		std::cout << getStringFromIDs(&vocabids, target_phrases[i].target_phrase) << "\t";
+		std::cout << getTargetWordsFromIDs(target_phrases[i].target_phrase, &vocabids) << "\t";
 		
 		//Print probabilities:
 		for (int j = 0; j<target_phrases[i].prob.size(); j++){
@@ -177,4 +166,3 @@ void QueryEngine::printTargetInfo(std::vector<target_text> target_phrases){
 		std::cout << std::endl;
 	}
 }
-*/

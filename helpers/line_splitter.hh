@@ -3,7 +3,8 @@
 #include "../util/file_piece.hh"
 #include <vector>
 #include <stdlib.h> //atof
-#include "vocabid.hh"
+#include "util/string_piece.hh"  //Tokenization and work with StringPiece
+#include "util/tokenize_piece.hh"
 
 //Struct for holding processed line
 struct line_text {

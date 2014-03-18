@@ -8,9 +8,7 @@
 #include "util/probing_hash_table.hh"
 #include "util/usage.hh"
 
-#include "helpers/vocabid.hh"
 #include "helpers/quering.hh"
-#include "helpers/hash.hh"
 
 #include <stdio.h>
 #include <sys/types.h>

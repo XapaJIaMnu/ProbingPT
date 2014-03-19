@@ -1,3 +1,5 @@
+#pragma once
+
 #include "probing_hash_utils.hh"
 #include "huffmanish.hh"
 #include "hash.hh" //Includes line splitter

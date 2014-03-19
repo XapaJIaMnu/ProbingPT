@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../util/string_piece.hh"
 #include "../util/tokenize_piece.hh"
 #include "../util/file_piece.hh"

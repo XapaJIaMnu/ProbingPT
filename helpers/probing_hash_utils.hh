@@ -1,3 +1,5 @@
+#pragma once
+
 #include "util/probing_hash_table.hh"
 
 #include <sys/mman.h>

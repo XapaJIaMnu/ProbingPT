@@ -11,6 +11,7 @@
 
 #include "util/file_piece.hh"
 #include "util/file.hh"
+#include "helpers/vocabid.hh"
 
 void createProbingPT(const char * phrasetable_path, const char * target_path);
 

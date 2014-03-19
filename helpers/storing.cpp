@@ -48,6 +48,9 @@ void createProbingPT(const char * phrasetable_path, const char * target_path){
 	//Get uniq lines:
 	unsigned long uniq_entries = huffmanEncoder.getUniqLines();
 
+	//Source phrase vocabids
+	std::map<uint64_t, std::string> source_vocabids;
+
 	//Read the file
 	util::FilePiece filein(phrasetable_path);
 
@@ -72,6 +75,8 @@ void createProbingPT(const char * phrasetable_path, const char * target_path){
 			//Process line read
 			line_text line;
 			line = splitLine(filein.ReadLine());
+			//Add source phrases to vocabularyIDs
+			add_to_map(&source_vocabids, line.source_phrase);
 
 			if ((binfile.dist_from_start + binfile.extra_counter) == 0) {
 				prev_line = line; //For the first iteration assume the previous line is
@@ -133,6 +138,8 @@ void createProbingPT(const char * phrasetable_path, const char * target_path){
 	}
 
 	serialize_table(mem, size, (basepath + "/probing_hash.dat").c_str());
+
+	serialize_map(&source_vocabids, (basepath + "/source_vocabids").c_str());
 	
 	delete[] mem;
 

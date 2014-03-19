@@ -28,6 +28,10 @@ QueryEngine::QueryEngine(const char * filepath) : decoder(filepath){
 	std::string basepath(filepath);
 	std::string path_to_hashtable = basepath + "/probing_hash.dat";
 	std::string path_to_data_bin = basepath + "/binfile.dat";
+	std::string path_to_source_vocabid = basepath + "/source_vocabids";
+
+	///Source phrase vocabids
+	read_map(&source_vocabids, path_to_source_vocabid.c_str());
 
 	//Target phrase vocabIDs
 	vocabids = decoder.get_target_lookup_map();

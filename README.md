@@ -1,4 +1,4 @@
-Proj4 - Honours project. First alpha
+ProbingPT 2.0
 ========================================
 
 Efficient phrase table implementation using kenLM's probing hash table. Models are taken from [StatMT](http://www.statmt.org/moses/RELEASE-1.0/models/en-cs/model/)
@@ -22,7 +22,8 @@ Now build the testsfiles with the following command:
 
 To create the library that links into Moses:
 ---------------------------------------------
-```ln -s ~/workspace/boost/boost_1_55_0 boost
+```
+ln -s ~/workspace/boost/boost_1_55_0 boost
 cd helpers
 ./compile-lib.sh 
 ```

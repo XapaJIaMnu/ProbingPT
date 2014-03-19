@@ -17,35 +17,40 @@ cd lib/kenlm
 Now build the testsfiles with the following command:
 
 ```
-<clang++||g++> filename.cpp helpers/*.cpp -I./ -L./lib/kenlm/lib/ -lkenlm -lz -lbz2 -llzma  -lboost_serialization -o output.o
+<clang++||g++> filename.cpp helpers/*.cpp -I./ -L./lib/kenlm/lib/ -lkenlm -lz -lbz2 -llzma  -lboost_serialization --std=c++11 -O3 -o output.o
 ```
 
 To create the library that links into Moses:
-ln -s ~/workspace/boost/boost_1_55_0 boost
+---------------------------------------------
+```ln -s ~/workspace/boost/boost_1_55_0 boost
 cd helpers
 ./compile-lib.sh 
+```
 
 
-First alpha
+Probing PT 2.0
 ------------
 
-Build both store_binary and query_binary:
+You can try out Probing PT with a demo decoder:
+
+Build both store_binary_vid and query_binary_vid:
 
 ```
-<clang++||g++> filename.cpp -I./ -L./lib/kenlm/lib/ -lkenlm -lz -lbz2 -llzma -o output.o
+<clang++||g++> store_binary_vid.cpp helpers/*.cpp -I./ -L./lib/kenlm/lib/ -lkenlm -lz -lbz2 -llzma  -lboost_serialization --std=c++11 -O3 -o store_binary_new.o
+<clang++||g++> query_binary_vid.cpp helpers/*.cpp -I./ -L./lib/kenlm/lib/ -lkenlm -lz -lbz2 -llzma  -lboost_serialization --std=c++11 -O3 -o query_binary_new.o
 ```
 
 After building you can create a phrase table by:
 
 ```
-./store_binary.o ../test/phrase-table.1.gz 916284 /tmp/data.bin /tmp/hash.bin
+./store_binary_new.o path-to-phrasetable destination-dir
 ```
-Where you provide the path to the phrase table, the number of rows of the phrase table and output locations for the two binaries.
+Where you provide the path to the phrase table and the location where the binary phrase table is created
 
 Querying the binary is done by:
 
 ```
-./query_binary.o data.bin hash.bin 916284
+./query_binary.o destination-dir
 ```
 
 KenLM

@@ -85,8 +85,6 @@ std::pair<bool, std::vector<target_text> > QueryEngine::query(std::vector<uint64
 		//from line_splitter
 		uint64_t initial_index = entry -> GetValue();
 		unsigned int bytes_toread = entry -> bytes_toread;
-		//At the end of the file we can't readd + largest_entry cause we get a segfault.
-		std::cerr << "Entry size is bytes is: " << bytes_toread << std::endl;
 		
 		//ASK HIEU FOR MORE EFFICIENT WAY TO DO THIS!
 		std::vector<unsigned char> encoded_text; //Assign to the vector the relevant portion of the array.

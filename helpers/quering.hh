@@ -4,7 +4,7 @@
 #include "huffmanish.hh"
 #include "hash.hh" //Includes line splitter
 #include <sys/stat.h> //For finding size of file
-#include "helpers/vocabid.hh"
+#include "vocabid.hh"
 
 
 char * read_binary_file(char * filename);

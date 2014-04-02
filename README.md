@@ -28,6 +28,10 @@ cd helpers
 ./compile-lib.sh 
 ```
 
+Then checkout Moses's [ProbingPT branch](https://github.com/moses-smt/mosesdecoder/tree/nikolay_probingPT) and build it with:
+```
+./bjam -j5 --with-probing-pt=/path/to/probingPT/repository
+```
 
 Probing PT 2.0
 ------------

@@ -1,3 +1,15 @@
+NOTE. Now part of Moses:
+=========================
+
+ProbingPT 2.0 has been integrated into Moses master. All updates to the code will happen on the moses repository and not here.
+As of 13.06.2014 this repo is deprecated and exists only for reference.
+
+To build [Moses](https://github.com/moses-smt/mosesdecoder) with ProbingPT do a:
+```
+./bjam -j10 --with-probing-pt
+```
+
+
 ProbingPT 2.0
 ========================================
 

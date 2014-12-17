@@ -93,7 +93,7 @@ void createProbingPT(const char * phrasetable_path, const char * target_path){
 				pesho.key = 0;
 				std::vector<uint64_t> vocabid_source = getVocabIDs(prev_line.source_phrase);
 				for (int i = 0; i < vocabid_source.size(); i++){
-					pesho.key += vocabid_source[i];
+					pesho.key += (vocabid_source[i] << i);
 				}
 				pesho.bytes_toread = binfile.dist_from_start + binfile.extra_counter - entrystartidx;
 
@@ -127,7 +127,7 @@ void createProbingPT(const char * phrasetable_path, const char * target_path){
 			pesho.key = 0;
 			std::vector<uint64_t> vocabid_source = getVocabIDs(prev_line.source_phrase);
 			for (int i = 0; i < vocabid_source.size(); i++){
-				pesho.key += vocabid_source[i];
+				pesho.key += (vocabid_source[i] << i);
 			}
 			pesho.bytes_toread = binfile.dist_from_start + binfile.extra_counter - entrystartidx;
 			//Put into table

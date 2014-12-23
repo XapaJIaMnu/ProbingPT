@@ -54,7 +54,7 @@ Build both store_binary_vid and query_binary_vid:
 After building you can create a phrase table by:
 
 ```
-./store_binary_new.o path-to-phrasetable destination-dir
+./store_binary_new.o path-to-phrasetable destination-dir num_scores
 ```
 Where you provide the path to the phrase table and the location where the binary phrase table is created
 

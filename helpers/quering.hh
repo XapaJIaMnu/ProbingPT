@@ -5,6 +5,8 @@
 #include "hash.hh" //Includes line splitter
 #include <sys/stat.h> //For finding size of file
 #include "vocabid.hh"
+#include <algorithm> //toLower
+#define API_VERSION 3
 
 
 char * read_binary_file(char * filename);
@@ -21,18 +23,20 @@ class QueryEngine {
 
 	size_t binary_filesize;
 	size_t table_filesize;
+	int num_scores;
+	bool is_reordering;
 	public:
 		QueryEngine (const char *);
 		~QueryEngine();
 		std::pair<bool, std::vector<target_text> > query(StringPiece source_phrase);
 		std::pair<bool, std::vector<target_text> > query(std::vector<uint64_t> source_phrase);
 		void printTargetInfo(std::vector<target_text> target_phrases);
-  	    const std::map<unsigned int, std::string> getVocab() const
-  	    { return decoder.get_target_lookup_map(); }
+		const std::map<unsigned int, std::string> getVocab() const
+		{ return decoder.get_target_lookup_map(); }
 
-  	    const std::map<uint64_t, std::string> getSourceVocab() const {
-  	    	return source_vocabids;
-  	    }
+		const std::map<uint64_t, std::string> getSourceVocab() const {
+			return source_vocabids;
+		}
 
 };
 
